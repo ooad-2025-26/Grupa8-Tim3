@@ -1,11 +1,11 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Page-1" id="iXoKOr4oVXxfNnTWSvxV">
-    <mxGraphModel dx="1501" dy="1399" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1205" dy="753" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
         <mxCell id="HNmhLBdW39bgDMpP8c6p-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;" value="" vertex="1">
-          <mxGeometry height="1222" width="720" x="65" y="98" as="geometry" />
+          <mxGeometry height="1322" width="720" x="65" y="98" as="geometry" />
         </mxCell>
         <mxCell id="HNmhLBdW39bgDMpP8c6p-6" edge="1" parent="1" source="HNmhLBdW39bgDMpP8c6p-1" style="endArrow=none;html=1;rounded=0;exitX=0.333;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
@@ -127,8 +127,10 @@
         <mxCell id="HNmhLBdW39bgDMpP8c6p-33" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=none;" value="Korisnik postoji?" vertex="1">
           <mxGeometry height="80" width="80" x="385" y="845" as="geometry" />
         </mxCell>
-        <mxCell id="HNmhLBdW39bgDMpP8c6p-42" edge="1" parent="1" source="HNmhLBdW39bgDMpP8c6p-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#FF0000;fontColor=#FF0000;" target="HNmhLBdW39bgDMpP8c6p-39">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="HNmhLBdW39bgDMpP8c6p-42" edge="1" parent="1" source="HNmhLBdW39bgDMpP8c6p-35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#FF0000;fontColor=#FF0000;" target="KyfRsOcCnX72L-ZYvQ7v-1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="245" y="995" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="HNmhLBdW39bgDMpP8c6p-35" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Prikazuje&lt;div&gt;poruku o nemogućoj registraciji&lt;/div&gt;" vertex="1">
           <mxGeometry height="60" width="80" x="325" y="965" as="geometry" />
@@ -139,19 +141,10 @@
         <mxCell id="HNmhLBdW39bgDMpP8c6p-37" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Kreira korisnički nalog" vertex="1">
           <mxGeometry height="60" width="80" x="445" y="965" as="geometry" />
         </mxCell>
-        <mxCell id="HNmhLBdW39bgDMpP8c6p-39" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Prekid registracije/Prelazak na prijavu" vertex="1">
-          <mxGeometry height="60" width="120" x="125" y="965" as="geometry" />
-        </mxCell>
-        <mxCell id="HNmhLBdW39bgDMpP8c6p-43" parent="1" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" value="" vertex="1">
-          <mxGeometry height="30" width="30" x="170" y="1065" as="geometry" />
-        </mxCell>
-        <mxCell id="HNmhLBdW39bgDMpP8c6p-44" edge="1" parent="1" source="HNmhLBdW39bgDMpP8c6p-39" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#FF0000;fontColor=#FF0000;" target="HNmhLBdW39bgDMpP8c6p-43">
+        <mxCell id="HNmhLBdW39bgDMpP8c6p-51" edge="1" parent="1" source="HNmhLBdW39bgDMpP8c6p-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#FF0000;fontColor=#FF0000;" target="KyfRsOcCnX72L-ZYvQ7v-2">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="182" y="1065" as="targetPoint" />
+            <mxPoint x="245" y="1210" as="targetPoint" />
           </mxGeometry>
-        </mxCell>
-        <mxCell id="HNmhLBdW39bgDMpP8c6p-51" edge="1" parent="1" source="HNmhLBdW39bgDMpP8c6p-45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#FF0000;fontColor=#FF0000;" target="HNmhLBdW39bgDMpP8c6p-50">
-          <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="HNmhLBdW39bgDMpP8c6p-45" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Šalje email potvrde korisniku" vertex="1">
           <mxGeometry height="60" width="120" x="610" y="1065" as="geometry" />
@@ -162,20 +155,32 @@
         <mxCell id="HNmhLBdW39bgDMpP8c6p-46" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Šalje potvrdu o registraciji" vertex="1">
           <mxGeometry height="60" width="80" x="445" y="1065" as="geometry" />
         </mxCell>
-        <mxCell id="HNmhLBdW39bgDMpP8c6p-50" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Prima potvrdu o registraciji" vertex="1">
-          <mxGeometry height="60" width="120" x="125" y="1180" as="geometry" />
-        </mxCell>
         <mxCell id="HNmhLBdW39bgDMpP8c6p-52" parent="1" style="ellipse;html=1;shape=endState;fillColor=#000000;strokeColor=#ff0000;" value="" vertex="1">
-          <mxGeometry height="30" width="30" x="170" y="1280" as="geometry" />
+          <mxGeometry height="30" width="30" x="170" y="1360" as="geometry" />
         </mxCell>
         <mxCell id="HNmhLBdW39bgDMpP8c6p-53" edge="1" parent="1" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#FF0000;fontColor=#FF0000;" target="HNmhLBdW39bgDMpP8c6p-52">
           <mxGeometry relative="1" as="geometry">
-            <mxPoint x="185" y="1240" as="sourcePoint" />
-            <mxPoint x="182" y="1280" as="targetPoint" />
+            <mxPoint x="185" y="1320" as="sourcePoint" />
+            <mxPoint x="182" y="1360" as="targetPoint" />
           </mxGeometry>
         </mxCell>
         <mxCell id="HNmhLBdW39bgDMpP8c6p-54" parent="1" style="text;align=center;fontStyle=1;verticalAlign=middle;spacingLeft=3;spacingRight=3;strokeColor=none;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;html=1;" value="&lt;font style=&quot;font-size: 30px;&quot;&gt;Registracija&lt;/font&gt;" vertex="1">
           <mxGeometry height="26" width="80" x="385" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="KyfRsOcCnX72L-ZYvQ7v-5" edge="1" parent="1" source="KyfRsOcCnX72L-ZYvQ7v-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0;entryDx=0;entryDy=0;strokeColor=#FF0000;" target="KyfRsOcCnX72L-ZYvQ7v-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KyfRsOcCnX72L-ZYvQ7v-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Prekid registracije/&lt;div&gt;Prelazak na prijavu&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="80" x="80" y="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="KyfRsOcCnX72L-ZYvQ7v-4" edge="1" parent="1" source="KyfRsOcCnX72L-ZYvQ7v-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;strokeColor=#FF0000;" target="KyfRsOcCnX72L-ZYvQ7v-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="KyfRsOcCnX72L-ZYvQ7v-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=light-dark(#000000,#000000);" value="Prima potvrdu o registraciji" vertex="1">
+          <mxGeometry height="60" width="80" x="200" y="1140" as="geometry" />
+        </mxCell>
+        <mxCell id="KyfRsOcCnX72L-ZYvQ7v-3" parent="1" style="rhombus;whiteSpace=wrap;html=1;fillColor=none;" value="" vertex="1">
+          <mxGeometry height="80" width="80" x="145" y="1240" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
