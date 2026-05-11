@@ -1,0 +1,89 @@
+﻿@model IEnumerable<StudyBuddyApp.Models.SesijaUcenja>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Naziv)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Opis)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DatumVrijeme)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Trajanje)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lokacija)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Predmet)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Kreator)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaksimalanBrojUcesnika)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BrojSlobodnihMjesta)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StatusSesije)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Naziv)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Opis)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DatumVrijeme)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Trajanje)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lokacija.IdLokacije)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Predmet.IdPredmeta)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Kreator.IdKorisnika)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaksimalanBrojUcesnika)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BrojSlobodnihMjesta)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StatusSesije)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.IdSesije">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.IdSesije">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.IdSesije">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
