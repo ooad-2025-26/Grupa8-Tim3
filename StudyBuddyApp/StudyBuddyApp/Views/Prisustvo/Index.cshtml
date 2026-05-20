@@ -1,14 +1,18 @@
 ﻿@model IEnumerable<StudyBuddyApp.Models.Prisustvo>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Prisustva";
 }
 
-<h1>Index</h1>
+<h1>Prisustva</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -28,26 +32,37 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Korisnik.IdKorisnika)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SesijaUcenja.IdSesije)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrajanjeUcenja)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StatusPrisustva)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdPrisustva">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdPrisustva">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdPrisustva">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Korisnik!.Ime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SesijaUcenja!.Naziv)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TrajanjeUcenja)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StatusPrisustva)
+                </td>
+                <td>
+                    @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.IdPrisustva">Edit</a>
+                        <span>|</span>
+                    }
+
+                    <a asp-action="Details" asp-route-id="@item.IdPrisustva">Details</a>
+
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <span>|</span>
+                        <a asp-action="Delete" asp-route-id="@item.IdPrisustva">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

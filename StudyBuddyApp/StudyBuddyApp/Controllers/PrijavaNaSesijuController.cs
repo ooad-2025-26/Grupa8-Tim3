@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +7,7 @@ using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize]
     public class PrijavaNaSesijuController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,14 +17,15 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: PrijavaNaSesiju
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.PrijaveNaSesije.Include(p => p.Korisnik).Include(p => p.SesijaUcenja);
-            return View(await applicationDbContext.ToListAsync());
+            var prijave = _context.PrijaveNaSesije
+                .Include(p => p.Korisnik)
+                .Include(p => p.SesijaUcenja);
+
+            return View(await prijave.ToListAsync());
         }
 
-        // GET: PrijavaNaSesiju/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -38,6 +37,7 @@ namespace StudyBuddyApp.Controllers
                 .Include(p => p.Korisnik)
                 .Include(p => p.SesijaUcenja)
                 .FirstOrDefaultAsync(m => m.IdPrijave == id);
+
             if (prijavaNaSesiju == null)
             {
                 return NotFound();
@@ -46,17 +46,16 @@ namespace StudyBuddyApp.Controllers
             return View(prijavaNaSesiju);
         }
 
-        // GET: PrijavaNaSesiju/Create
+        [Authorize(Roles = "Administrator,Student")]
         public IActionResult Create()
         {
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika");
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije");
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime");
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv");
+
             return View();
         }
 
-        // POST: PrijavaNaSesiju/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator,Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdPrijave,DatumPrijave,KorisnikId,SesijaId,StatusPrijave")] PrijavaNaSesiju prijavaNaSesiju)
@@ -67,12 +66,14 @@ namespace StudyBuddyApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", prijavaNaSesiju.KorisnikId);
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije", prijavaNaSesiju.SesijaId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", prijavaNaSesiju.KorisnikId);
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv", prijavaNaSesiju.SesijaId);
+
             return View(prijavaNaSesiju);
         }
 
-        // GET: PrijavaNaSesiju/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,18 +82,19 @@ namespace StudyBuddyApp.Controllers
             }
 
             var prijavaNaSesiju = await _context.PrijaveNaSesije.FindAsync(id);
+
             if (prijavaNaSesiju == null)
             {
                 return NotFound();
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", prijavaNaSesiju.KorisnikId);
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije", prijavaNaSesiju.SesijaId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", prijavaNaSesiju.KorisnikId);
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv", prijavaNaSesiju.SesijaId);
+
             return View(prijavaNaSesiju);
         }
 
-        // POST: PrijavaNaSesiju/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdPrijave,DatumPrijave,KorisnikId,SesijaId,StatusPrijave")] PrijavaNaSesiju prijavaNaSesiju)
@@ -115,19 +117,20 @@ namespace StudyBuddyApp.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", prijavaNaSesiju.KorisnikId);
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije", prijavaNaSesiju.SesijaId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", prijavaNaSesiju.KorisnikId);
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv", prijavaNaSesiju.SesijaId);
+
             return View(prijavaNaSesiju);
         }
 
-        // GET: PrijavaNaSesiju/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -139,6 +142,7 @@ namespace StudyBuddyApp.Controllers
                 .Include(p => p.Korisnik)
                 .Include(p => p.SesijaUcenja)
                 .FirstOrDefaultAsync(m => m.IdPrijave == id);
+
             if (prijavaNaSesiju == null)
             {
                 return NotFound();
@@ -147,18 +151,19 @@ namespace StudyBuddyApp.Controllers
             return View(prijavaNaSesiju);
         }
 
-        // POST: PrijavaNaSesiju/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var prijavaNaSesiju = await _context.PrijaveNaSesije.FindAsync(id);
+
             if (prijavaNaSesiju != null)
             {
                 _context.PrijaveNaSesije.Remove(prijavaNaSesiju);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

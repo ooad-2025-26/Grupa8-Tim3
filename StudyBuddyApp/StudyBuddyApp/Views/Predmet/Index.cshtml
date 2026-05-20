@@ -1,14 +1,18 @@
 ﻿@model IEnumerable<StudyBuddyApp.Models.Predmet>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Predmeti";
 }
 
-<h1>Index</h1>
+<h1>Predmeti</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole("Administrator"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -28,26 +32,37 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Naziv)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Opis)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Oznaka)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StatusPredmeta)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdPredmeta">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdPredmeta">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdPredmeta">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Naziv)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Opis)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Oznaka)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StatusPredmeta)
+                </td>
+                <td>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.IdPredmeta">Edit</a>
+                        <span>|</span>
+                    }
+
+                    <a asp-action="Details" asp-route-id="@item.IdPredmeta">Details</a>
+
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <span>|</span>
+                        <a asp-action="Delete" asp-route-id="@item.IdPredmeta">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

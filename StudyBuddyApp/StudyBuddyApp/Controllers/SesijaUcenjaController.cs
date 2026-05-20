@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +7,7 @@ using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize]
     public class SesijaUcenjaController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,14 +17,16 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: SesijaUcenja
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.SesijeUcenja.Include(s => s.Kreator).Include(s => s.Lokacija).Include(s => s.Predmet);
-            return View(await applicationDbContext.ToListAsync());
+            var sesije = _context.SesijeUcenja
+                .Include(s => s.Kreator)
+                .Include(s => s.Lokacija)
+                .Include(s => s.Predmet);
+
+            return View(await sesije.ToListAsync());
         }
 
-        // GET: SesijaUcenja/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,6 +39,7 @@ namespace StudyBuddyApp.Controllers
                 .Include(s => s.Lokacija)
                 .Include(s => s.Predmet)
                 .FirstOrDefaultAsync(m => m.IdSesije == id);
+
             if (sesijaUcenja == null)
             {
                 return NotFound();
@@ -47,18 +48,17 @@ namespace StudyBuddyApp.Controllers
             return View(sesijaUcenja);
         }
 
-        // GET: SesijaUcenja/Create
+        [Authorize(Roles = "Administrator,Student")]
         public IActionResult Create()
         {
-            ViewData["KreatorId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika");
-            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "IdLokacije");
-            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "IdPredmeta");
+            ViewData["KreatorId"] = new SelectList(_context.Users, "Id", "Ime");
+            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv");
+            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv");
+
             return View();
         }
 
-        // POST: SesijaUcenja/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator,Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,KreatorId,MaksimalanBrojUcesnika,BrojSlobodnihMjesta,StatusSesije")] SesijaUcenja sesijaUcenja)
@@ -69,13 +69,15 @@ namespace StudyBuddyApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KreatorId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", sesijaUcenja.KreatorId);
-            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "IdLokacije", sesijaUcenja.LokacijaId);
-            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "IdPredmeta", sesijaUcenja.PredmetId);
+
+            ViewData["KreatorId"] = new SelectList(_context.Users, "Id", "Ime", sesijaUcenja.KreatorId);
+            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv", sesijaUcenja.LokacijaId);
+            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv", sesijaUcenja.PredmetId);
+
             return View(sesijaUcenja);
         }
 
-        // GET: SesijaUcenja/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,19 +86,20 @@ namespace StudyBuddyApp.Controllers
             }
 
             var sesijaUcenja = await _context.SesijeUcenja.FindAsync(id);
+
             if (sesijaUcenja == null)
             {
                 return NotFound();
             }
-            ViewData["KreatorId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", sesijaUcenja.KreatorId);
-            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "IdLokacije", sesijaUcenja.LokacijaId);
-            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "IdPredmeta", sesijaUcenja.PredmetId);
+
+            ViewData["KreatorId"] = new SelectList(_context.Users, "Id", "Ime", sesijaUcenja.KreatorId);
+            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv", sesijaUcenja.LokacijaId);
+            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv", sesijaUcenja.PredmetId);
+
             return View(sesijaUcenja);
         }
 
-        // POST: SesijaUcenja/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,KreatorId,MaksimalanBrojUcesnika,BrojSlobodnihMjesta,StatusSesije")] SesijaUcenja sesijaUcenja)
@@ -119,20 +122,21 @@ namespace StudyBuddyApp.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KreatorId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", sesijaUcenja.KreatorId);
-            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "IdLokacije", sesijaUcenja.LokacijaId);
-            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "IdPredmeta", sesijaUcenja.PredmetId);
+
+            ViewData["KreatorId"] = new SelectList(_context.Users, "Id", "Ime", sesijaUcenja.KreatorId);
+            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv", sesijaUcenja.LokacijaId);
+            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv", sesijaUcenja.PredmetId);
+
             return View(sesijaUcenja);
         }
 
-        // GET: SesijaUcenja/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -145,6 +149,7 @@ namespace StudyBuddyApp.Controllers
                 .Include(s => s.Lokacija)
                 .Include(s => s.Predmet)
                 .FirstOrDefaultAsync(m => m.IdSesije == id);
+
             if (sesijaUcenja == null)
             {
                 return NotFound();
@@ -153,18 +158,19 @@ namespace StudyBuddyApp.Controllers
             return View(sesijaUcenja);
         }
 
-        // POST: SesijaUcenja/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var sesijaUcenja = await _context.SesijeUcenja.FindAsync(id);
+
             if (sesijaUcenja != null)
             {
                 _context.SesijeUcenja.Remove(sesijaUcenja);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

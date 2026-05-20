@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +7,7 @@ using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize]
     public class PrisustvoController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,14 +17,15 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: Prisustvo
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Prisustva.Include(p => p.Korisnik).Include(p => p.SesijaUcenja);
-            return View(await applicationDbContext.ToListAsync());
+            var prisustva = _context.Prisustva
+                .Include(p => p.Korisnik)
+                .Include(p => p.SesijaUcenja);
+
+            return View(await prisustva.ToListAsync());
         }
 
-        // GET: Prisustvo/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -38,6 +37,7 @@ namespace StudyBuddyApp.Controllers
                 .Include(p => p.Korisnik)
                 .Include(p => p.SesijaUcenja)
                 .FirstOrDefaultAsync(m => m.IdPrisustva == id);
+
             if (prisustvo == null)
             {
                 return NotFound();
@@ -46,17 +46,16 @@ namespace StudyBuddyApp.Controllers
             return View(prisustvo);
         }
 
-        // GET: Prisustvo/Create
+        [Authorize(Roles = "Administrator,Moderator")]
         public IActionResult Create()
         {
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika");
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije");
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime");
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv");
+
             return View();
         }
 
-        // POST: Prisustvo/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdPrisustva,KorisnikId,SesijaId,TrajanjeUcenja,StatusPrisustva")] Prisustvo prisustvo)
@@ -67,12 +66,14 @@ namespace StudyBuddyApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", prisustvo.KorisnikId);
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije", prisustvo.SesijaId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", prisustvo.KorisnikId);
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv", prisustvo.SesijaId);
+
             return View(prisustvo);
         }
 
-        // GET: Prisustvo/Edit/5
+        [Authorize(Roles = "Administrator,Moderator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,18 +82,19 @@ namespace StudyBuddyApp.Controllers
             }
 
             var prisustvo = await _context.Prisustva.FindAsync(id);
+
             if (prisustvo == null)
             {
                 return NotFound();
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", prisustvo.KorisnikId);
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije", prisustvo.SesijaId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", prisustvo.KorisnikId);
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv", prisustvo.SesijaId);
+
             return View(prisustvo);
         }
 
-        // POST: Prisustvo/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdPrisustva,KorisnikId,SesijaId,TrajanjeUcenja,StatusPrisustva")] Prisustvo prisustvo)
@@ -115,19 +117,20 @@ namespace StudyBuddyApp.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", prisustvo.KorisnikId);
-            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "IdSesije", prisustvo.SesijaId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", prisustvo.KorisnikId);
+            ViewData["SesijaId"] = new SelectList(_context.SesijeUcenja, "IdSesije", "Naziv", prisustvo.SesijaId);
+
             return View(prisustvo);
         }
 
-        // GET: Prisustvo/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -139,6 +142,7 @@ namespace StudyBuddyApp.Controllers
                 .Include(p => p.Korisnik)
                 .Include(p => p.SesijaUcenja)
                 .FirstOrDefaultAsync(m => m.IdPrisustva == id);
+
             if (prisustvo == null)
             {
                 return NotFound();
@@ -147,18 +151,19 @@ namespace StudyBuddyApp.Controllers
             return View(prisustvo);
         }
 
-        // POST: Prisustvo/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var prisustvo = await _context.Prisustva.FindAsync(id);
+
             if (prisustvo != null)
             {
                 _context.Prisustva.Remove(prisustvo);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

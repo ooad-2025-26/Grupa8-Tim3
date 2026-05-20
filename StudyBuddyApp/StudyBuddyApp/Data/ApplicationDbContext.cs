@@ -4,14 +4,13 @@ using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    public class ApplicationDbContext : IdentityDbContext<Korisnik>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<Korisnik> Korisnici { get; set; }
         public DbSet<Uloga> Uloge { get; set; }
         public DbSet<Predmet> Predmeti { get; set; }
         public DbSet<Lokacija> Lokacije { get; set; }
@@ -24,7 +23,7 @@ namespace StudyBuddyApp.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Korisnik>().ToTable("Korisnik");
+            modelBuilder.Entity<Korisnik>().ToTable("AspNetUsers");
             modelBuilder.Entity<Uloga>().ToTable("Uloga");
             modelBuilder.Entity<Predmet>().ToTable("Predmet");
             modelBuilder.Entity<Lokacija>().ToTable("Lokacija");

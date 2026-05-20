@@ -29,7 +29,7 @@ namespace StudyBuddyApp.Models
         public Predmet? Predmet { get; set; }
 
         [ForeignKey("Kreator")]
-        public int KreatorId { get; set; }
+        public string KreatorId { get; set; } = string.Empty;
 
         public Korisnik? Kreator { get; set; }
 

@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class UlogaController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,13 +16,11 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: Uloga
         public async Task<IActionResult> Index()
         {
             return View(await _context.Uloge.ToListAsync());
         }
 
-        // GET: Uloga/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,6 +30,7 @@ namespace StudyBuddyApp.Controllers
 
             var uloga = await _context.Uloge
                 .FirstOrDefaultAsync(m => m.IdUloge == id);
+
             if (uloga == null)
             {
                 return NotFound();
@@ -43,15 +39,11 @@ namespace StudyBuddyApp.Controllers
             return View(uloga);
         }
 
-        // GET: Uloga/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Uloga/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdUloge,Naziv,Opis")] Uloga uloga)
@@ -62,10 +54,10 @@ namespace StudyBuddyApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(uloga);
         }
 
-        // GET: Uloga/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,16 +66,15 @@ namespace StudyBuddyApp.Controllers
             }
 
             var uloga = await _context.Uloge.FindAsync(id);
+
             if (uloga == null)
             {
                 return NotFound();
             }
+
             return View(uloga);
         }
 
-        // POST: Uloga/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdUloge,Naziv,Opis")] Uloga uloga)
@@ -106,17 +97,16 @@ namespace StudyBuddyApp.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(uloga);
         }
 
-        // GET: Uloga/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,6 +116,7 @@ namespace StudyBuddyApp.Controllers
 
             var uloga = await _context.Uloge
                 .FirstOrDefaultAsync(m => m.IdUloge == id);
+
             if (uloga == null)
             {
                 return NotFound();
@@ -134,18 +125,18 @@ namespace StudyBuddyApp.Controllers
             return View(uloga);
         }
 
-        // POST: Uloga/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var uloga = await _context.Uloge.FindAsync(id);
+
             if (uloga != null)
             {
                 _context.Uloge.Remove(uloga);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

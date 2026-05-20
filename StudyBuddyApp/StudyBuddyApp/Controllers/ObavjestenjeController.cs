@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +7,7 @@ using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize]
     public class ObavjestenjeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,14 +17,14 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: Obavjestenje
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Obavjestenja.Include(o => o.Korisnik);
-            return View(await applicationDbContext.ToListAsync());
+            var obavjestenja = _context.Obavjestenja
+                .Include(o => o.Korisnik);
+
+            return View(await obavjestenja.ToListAsync());
         }
 
-        // GET: Obavjestenje/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -37,6 +35,7 @@ namespace StudyBuddyApp.Controllers
             var obavjestenje = await _context.Obavjestenja
                 .Include(o => o.Korisnik)
                 .FirstOrDefaultAsync(m => m.IdObavjestenja == id);
+
             if (obavjestenje == null)
             {
                 return NotFound();
@@ -45,16 +44,15 @@ namespace StudyBuddyApp.Controllers
             return View(obavjestenje);
         }
 
-        // GET: Obavjestenje/Create
+        [Authorize(Roles = "Administrator,Moderator")]
         public IActionResult Create()
         {
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika");
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime");
+
             return View();
         }
 
-        // POST: Obavjestenje/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdObavjestenja,Naslov,Sadrzaj,DatumSlanja,KorisnikId,TipObavjestenja,Procitano")] Obavjestenje obavjestenje)
@@ -65,11 +63,13 @@ namespace StudyBuddyApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", obavjestenje.KorisnikId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", obavjestenje.KorisnikId);
+
             return View(obavjestenje);
         }
 
-        // GET: Obavjestenje/Edit/5
+        [Authorize(Roles = "Administrator,Moderator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,17 +78,18 @@ namespace StudyBuddyApp.Controllers
             }
 
             var obavjestenje = await _context.Obavjestenja.FindAsync(id);
+
             if (obavjestenje == null)
             {
                 return NotFound();
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", obavjestenje.KorisnikId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", obavjestenje.KorisnikId);
+
             return View(obavjestenje);
         }
 
-        // POST: Obavjestenje/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator,Moderator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdObavjestenja,Naslov,Sadrzaj,DatumSlanja,KorisnikId,TipObavjestenja,Procitano")] Obavjestenje obavjestenje)
@@ -111,18 +112,19 @@ namespace StudyBuddyApp.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["KorisnikId"] = new SelectList(_context.Korisnici, "IdKorisnika", "IdKorisnika", obavjestenje.KorisnikId);
+
+            ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", obavjestenje.KorisnikId);
+
             return View(obavjestenje);
         }
 
-        // GET: Obavjestenje/Delete/5
+        [Authorize(Roles = "Administrator,Moderator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -133,6 +135,7 @@ namespace StudyBuddyApp.Controllers
             var obavjestenje = await _context.Obavjestenja
                 .Include(o => o.Korisnik)
                 .FirstOrDefaultAsync(m => m.IdObavjestenja == id);
+
             if (obavjestenje == null)
             {
                 return NotFound();
@@ -141,18 +144,19 @@ namespace StudyBuddyApp.Controllers
             return View(obavjestenje);
         }
 
-        // POST: Obavjestenje/Delete/5
+        [Authorize(Roles = "Administrator,Moderator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var obavjestenje = await _context.Obavjestenja.FindAsync(id);
+
             if (obavjestenje != null)
             {
                 _context.Obavjestenja.Remove(obavjestenje);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

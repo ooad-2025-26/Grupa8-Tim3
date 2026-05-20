@@ -11,7 +11,7 @@ namespace StudyBuddyApp.Models
         public int IdPrisustva { get; set; }
 
         [ForeignKey("Korisnik")]
-        public int KorisnikId { get; set; }
+        public string KorisnikId { get; set; } = string.Empty;
 
         public Korisnik? Korisnik { get; set; }
 

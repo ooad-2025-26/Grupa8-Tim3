@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize]
     public class LokacijaController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,13 +16,11 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: Lokacija
         public async Task<IActionResult> Index()
         {
             return View(await _context.Lokacije.ToListAsync());
         }
 
-        // GET: Lokacija/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,6 +30,7 @@ namespace StudyBuddyApp.Controllers
 
             var lokacija = await _context.Lokacije
                 .FirstOrDefaultAsync(m => m.IdLokacije == id);
+
             if (lokacija == null)
             {
                 return NotFound();
@@ -43,15 +39,13 @@ namespace StudyBuddyApp.Controllers
             return View(lokacija);
         }
 
-        // GET: Lokacija/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Lokacija/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdLokacije,Naziv,TipLokacije,Adresa,Link")] Lokacija lokacija)
@@ -62,10 +56,11 @@ namespace StudyBuddyApp.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
             return View(lokacija);
         }
 
-        // GET: Lokacija/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,16 +69,16 @@ namespace StudyBuddyApp.Controllers
             }
 
             var lokacija = await _context.Lokacije.FindAsync(id);
+
             if (lokacija == null)
             {
                 return NotFound();
             }
+
             return View(lokacija);
         }
 
-        // POST: Lokacija/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdLokacije,Naziv,TipLokacije,Adresa,Link")] Lokacija lokacija)
@@ -106,17 +101,17 @@ namespace StudyBuddyApp.Controllers
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(lokacija);
         }
 
-        // GET: Lokacija/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -126,6 +121,7 @@ namespace StudyBuddyApp.Controllers
 
             var lokacija = await _context.Lokacije
                 .FirstOrDefaultAsync(m => m.IdLokacije == id);
+
             if (lokacija == null)
             {
                 return NotFound();
@@ -134,18 +130,19 @@ namespace StudyBuddyApp.Controllers
             return View(lokacija);
         }
 
-        // POST: Lokacija/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var lokacija = await _context.Lokacije.FindAsync(id);
+
             if (lokacija != null)
             {
                 _context.Lokacije.Remove(lokacija);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

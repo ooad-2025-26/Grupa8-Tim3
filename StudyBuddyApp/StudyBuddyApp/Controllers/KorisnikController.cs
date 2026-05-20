@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
 
 namespace StudyBuddyApp.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class KorisnikController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,22 +16,21 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        // GET: Korisnik
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Korisnici.ToListAsync());
+            return View(await _context.Users.ToListAsync());
         }
 
-        // GET: Korisnik/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var korisnik = await _context.Korisnici
-                .FirstOrDefaultAsync(m => m.IdKorisnika == id);
+            var korisnik = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (korisnik == null)
             {
                 return NotFound();
@@ -43,52 +39,60 @@ namespace StudyBuddyApp.Controllers
             return View(korisnik);
         }
 
-        // GET: Korisnik/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: Korisnik/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdKorisnika,Ime,Prezime,Email,Lozinka,UlogaId,StatusNaloga")] Korisnik korisnik)
+        public async Task<IActionResult> Create([Bind("Id,Ime,Prezime,Email,Uloga,StatusNaloga")] Korisnik korisnik)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(korisnik);
+                korisnik.UserName = korisnik.Email;
+                korisnik.NormalizedUserName = korisnik.Email?.ToUpper();
+                korisnik.NormalizedEmail = korisnik.Email?.ToUpper();
+                korisnik.EmailConfirmed = true;
+
+                _context.Users.Add(korisnik);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(korisnik);
         }
 
-        // GET: Korisnik/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var korisnik = await _context.Korisnici.FindAsync(id);
+            var korisnik = await _context.Users.FindAsync(id);
+
             if (korisnik == null)
             {
                 return NotFound();
             }
+
             return View(korisnik);
         }
 
-        // POST: Korisnik/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdKorisnika,Ime,Prezime,Email,Lozinka,UlogaId,StatusNaloga")] Korisnik korisnik)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Ime,Prezime,Email,Uloga,StatusNaloga")] Korisnik korisnik)
         {
-            if (id != korisnik.IdKorisnika)
+            if (id != korisnik.Id)
+            {
+                return NotFound();
+            }
+
+            var postojeciKorisnik = await _context.Users.FindAsync(id);
+
+            if (postojeciKorisnik == null)
             {
                 return NotFound();
             }
@@ -97,35 +101,44 @@ namespace StudyBuddyApp.Controllers
             {
                 try
                 {
-                    _context.Update(korisnik);
+                    postojeciKorisnik.Ime = korisnik.Ime;
+                    postojeciKorisnik.Prezime = korisnik.Prezime;
+                    postojeciKorisnik.Email = korisnik.Email;
+                    postojeciKorisnik.UserName = korisnik.Email;
+                    postojeciKorisnik.NormalizedEmail = korisnik.Email?.ToUpper();
+                    postojeciKorisnik.NormalizedUserName = korisnik.Email?.ToUpper();
+                    postojeciKorisnik.Uloga = korisnik.Uloga;
+                    postojeciKorisnik.StatusNaloga = korisnik.StatusNaloga;
+
+                    _context.Update(postojeciKorisnik);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!KorisnikExists(korisnik.IdKorisnika))
+                    if (!KorisnikExists(korisnik.Id))
                     {
                         return NotFound();
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    throw;
                 }
+
                 return RedirectToAction(nameof(Index));
             }
+
             return View(korisnik);
         }
 
-        // GET: Korisnik/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(string? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var korisnik = await _context.Korisnici
-                .FirstOrDefaultAsync(m => m.IdKorisnika == id);
+            var korisnik = await _context.Users
+                .FirstOrDefaultAsync(m => m.Id == id);
+
             if (korisnik == null)
             {
                 return NotFound();
@@ -134,24 +147,24 @@ namespace StudyBuddyApp.Controllers
             return View(korisnik);
         }
 
-        // POST: Korisnik/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(string id)
         {
-            var korisnik = await _context.Korisnici.FindAsync(id);
+            var korisnik = await _context.Users.FindAsync(id);
+
             if (korisnik != null)
             {
-                _context.Korisnici.Remove(korisnik);
+                _context.Users.Remove(korisnik);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool KorisnikExists(int id)
+        private bool KorisnikExists(string id)
         {
-            return _context.Korisnici.Any(e => e.IdKorisnika == id);
+            return _context.Users.Any(e => e.Id == id);
         }
     }
 }
