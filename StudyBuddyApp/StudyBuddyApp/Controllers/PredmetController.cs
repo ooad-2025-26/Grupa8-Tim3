@@ -17,6 +17,7 @@ namespace StudyBuddyApp.Controllers
         }
 
         public async Task<IActionResult> Index()
+
         {
             return View(await _context.Predmeti.ToListAsync());
         }
