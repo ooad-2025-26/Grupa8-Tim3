@@ -50,10 +50,13 @@ namespace StudyBuddyApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdLokacije,Naziv,TipLokacije,Adresa,Link")] Lokacija lokacija)
         {
+            ValidirajLokaciju(lokacija);
+
             if (ModelState.IsValid)
             {
-                _context.Add(lokacija);
+                _context.Lokacije.Add(lokacija);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
 
@@ -87,6 +90,8 @@ namespace StudyBuddyApp.Controllers
             {
                 return NotFound();
             }
+
+            ValidirajLokaciju(lokacija);
 
             if (ModelState.IsValid)
             {
@@ -144,6 +149,31 @@ namespace StudyBuddyApp.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private void ValidirajLokaciju(Lokacija lokacija)
+        {
+            if (lokacija.TipLokacije == TipLokacije.Online)
+            {
+                ModelState.Remove("Adresa");
+                lokacija.Adresa = string.Empty;
+
+                if (string.IsNullOrWhiteSpace(lokacija.Link))
+                {
+                    ModelState.AddModelError("Link", "Za online lokaciju potrebno je unijeti link.");
+                }
+            }
+
+            if (lokacija.TipLokacije == TipLokacije.Fizicka)
+            {
+                ModelState.Remove("Link");
+                lokacija.Link = string.Empty;
+
+                if (string.IsNullOrWhiteSpace(lokacija.Adresa))
+                {
+                    ModelState.AddModelError("Adresa", "Za fizičku lokaciju potrebno je unijeti adresu.");
+                }
+            }
         }
 
         private bool LokacijaExists(int id)

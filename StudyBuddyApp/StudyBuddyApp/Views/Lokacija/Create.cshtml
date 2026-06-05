@@ -1,48 +1,78 @@
 ﻿@model StudyBuddyApp.Models.Lokacija
+@using StudyBuddyApp.Models
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Kreiranje lokacije";
 }
 
-<h1>Create</h1>
+<h1>Kreiranje lokacije</h1>
 
 <h4>Lokacija</h4>
 <hr />
+
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-5">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="Naziv" class="control-label"></label>
                 <input asp-for="Naziv" class="form-control" />
                 <span asp-validation-for="Naziv" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="TipLokacije" class="control-label"></label>
-                <select asp-for="TipLokacije" class="form-control"></select>
+                <select asp-for="TipLokacije" class="form-control" asp-items="Html.GetEnumSelectList<TipLokacije>()" id="tipLokacijeSelect">
+                    <option value="">-- Odaberite tip lokacije --</option>
+                </select>
                 <span asp-validation-for="TipLokacije" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group" id="adresaPolje" style="display:none;">
                 <label asp-for="Adresa" class="control-label"></label>
                 <input asp-for="Adresa" class="form-control" />
                 <span asp-validation-for="Adresa" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group" id="linkPolje" style="display:none;">
                 <label asp-for="Link" class="control-label"></label>
                 <input asp-for="Link" class="form-control" />
                 <span asp-validation-for="Link" class="text-danger"></span>
             </div>
-            <div class="form-group">
+
+            <div class="form-group mt-3">
                 <input type="submit" value="Create" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function prikaziPoljaZaTipLokacije() {
+            const select = document.getElementById("tipLokacijeSelect");
+            const odabraniTekst = select.options[select.selectedIndex]?.text?.toLowerCase() || "";
+
+            const adresaPolje = document.getElementById("adresaPolje");
+            const linkPolje = document.getElementById("linkPolje");
+
+            adresaPolje.style.display = "none";
+            linkPolje.style.display = "none";
+
+            if (odabraniTekst.includes("online")) {
+                linkPolje.style.display = "block";
+            } else if (odabraniTekst.includes("fiz") || odabraniTekst.includes("učion") || odabraniTekst.includes("ucion") || odabraniTekst.includes("lokal")) {
+                adresaPolje.style.display = "block";
+            }
+        }
+
+        document.getElementById("tipLokacijeSelect").addEventListener("change", prikaziPoljaZaTipLokacije);
+        prikaziPoljaZaTipLokacije();
+    </script>
 }

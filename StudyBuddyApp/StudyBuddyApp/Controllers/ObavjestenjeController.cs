@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,18 +12,36 @@ namespace StudyBuddyApp.Controllers
     public class ObavjestenjeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Korisnik> _userManager;
 
-        public ObavjestenjeController(ApplicationDbContext context)
+        public ObavjestenjeController(
+            ApplicationDbContext context,
+            UserManager<Korisnik> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
-            var obavjestenja = _context.Obavjestenja
+            var korisnik = await _userManager.GetUserAsync(User);
+
+            if (korisnik == null)
+            {
+                return Challenge();
+            }
+
+            IQueryable<Obavjestenje> obavjestenja = _context.Obavjestenja
                 .Include(o => o.Korisnik);
 
-            return View(await obavjestenja.ToListAsync());
+            if (!User.IsInRole("Administrator") && !User.IsInRole("Moderator"))
+            {
+                obavjestenja = obavjestenja.Where(o => o.KorisnikId == korisnik.Id);
+            }
+
+            return View(await obavjestenja
+                .OrderByDescending(o => o.DatumSlanja)
+                .ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -30,6 +49,13 @@ namespace StudyBuddyApp.Controllers
             if (id == null)
             {
                 return NotFound();
+            }
+
+            var korisnik = await _userManager.GetUserAsync(User);
+
+            if (korisnik == null)
+            {
+                return Challenge();
             }
 
             var obavjestenje = await _context.Obavjestenja
@@ -41,6 +67,13 @@ namespace StudyBuddyApp.Controllers
                 return NotFound();
             }
 
+            if (!User.IsInRole("Administrator") &&
+                !User.IsInRole("Moderator") &&
+                obavjestenje.KorisnikId != korisnik.Id)
+            {
+                return Forbid();
+            }
+
             return View(obavjestenje);
         }
 
@@ -48,7 +81,6 @@ namespace StudyBuddyApp.Controllers
         public IActionResult Create()
         {
             ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime");
-
             return View();
         }
 
@@ -57,15 +89,20 @@ namespace StudyBuddyApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdObavjestenja,Naslov,Sadrzaj,DatumSlanja,KorisnikId,TipObavjestenja,Procitano")] Obavjestenje obavjestenje)
         {
+            if (obavjestenje.DatumSlanja == default)
+            {
+                obavjestenje.DatumSlanja = DateTime.Now;
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(obavjestenje);
+                _context.Obavjestenja.Add(obavjestenje);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction(nameof(Index));
             }
 
             ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", obavjestenje.KorisnikId);
-
             return View(obavjestenje);
         }
 
@@ -85,7 +122,6 @@ namespace StudyBuddyApp.Controllers
             }
 
             ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", obavjestenje.KorisnikId);
-
             return View(obavjestenje);
         }
 
@@ -120,7 +156,6 @@ namespace StudyBuddyApp.Controllers
             }
 
             ViewData["KorisnikId"] = new SelectList(_context.Users, "Id", "Ime", obavjestenje.KorisnikId);
-
             return View(obavjestenje);
         }
 
@@ -156,6 +191,37 @@ namespace StudyBuddyApp.Controllers
                 _context.Obavjestenja.Remove(obavjestenje);
                 await _context.SaveChangesAsync();
             }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OznaciKaoProcitano(int id)
+        {
+            var korisnik = await _userManager.GetUserAsync(User);
+
+            if (korisnik == null)
+            {
+                return Challenge();
+            }
+
+            var obavjestenje = await _context.Obavjestenja.FindAsync(id);
+
+            if (obavjestenje == null)
+            {
+                return NotFound();
+            }
+
+            if (!User.IsInRole("Administrator") &&
+                !User.IsInRole("Moderator") &&
+                obavjestenje.KorisnikId != korisnik.Id)
+            {
+                return Forbid();
+            }
+
+            obavjestenje.Procitano = true;
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }

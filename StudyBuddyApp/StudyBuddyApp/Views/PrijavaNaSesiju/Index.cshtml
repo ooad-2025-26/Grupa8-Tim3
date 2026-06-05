@@ -6,7 +6,7 @@
 
 <h1>Prijave na sesiju</h1>
 
-@if (User.IsInRole("Administrator") || User.IsInRole("Student"))
+@if (User.IsInRole("Administrator"))
 {
     <p>
         <a asp-action="Create">Create New</a>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,17 +12,33 @@ namespace StudyBuddyApp.Controllers
     public class PrisustvoController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<Korisnik> _userManager;
 
-        public PrisustvoController(ApplicationDbContext context)
+        public PrisustvoController(
+            ApplicationDbContext context,
+            UserManager<Korisnik> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IActionResult> Index()
         {
-            var prisustva = _context.Prisustva
+            var korisnik = await _userManager.GetUserAsync(User);
+
+            if (korisnik == null)
+            {
+                return Challenge();
+            }
+
+            IQueryable<Prisustvo> prisustva = _context.Prisustva
                 .Include(p => p.Korisnik)
                 .Include(p => p.SesijaUcenja);
+
+            if (!User.IsInRole("Administrator") && !User.IsInRole("Moderator"))
+            {
+                prisustva = prisustva.Where(p => p.KorisnikId == korisnik.Id);
+            }
 
             return View(await prisustva.ToListAsync());
         }
@@ -33,6 +50,13 @@ namespace StudyBuddyApp.Controllers
                 return NotFound();
             }
 
+            var korisnik = await _userManager.GetUserAsync(User);
+
+            if (korisnik == null)
+            {
+                return Challenge();
+            }
+
             var prisustvo = await _context.Prisustva
                 .Include(p => p.Korisnik)
                 .Include(p => p.SesijaUcenja)
@@ -41,6 +65,13 @@ namespace StudyBuddyApp.Controllers
             if (prisustvo == null)
             {
                 return NotFound();
+            }
+
+            if (!User.IsInRole("Administrator") &&
+                !User.IsInRole("Moderator") &&
+                prisustvo.KorisnikId != korisnik.Id)
+            {
+                return Forbid();
             }
 
             return View(prisustvo);
@@ -60,9 +91,14 @@ namespace StudyBuddyApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("IdPrisustva,KorisnikId,SesijaId,TrajanjeUcenja,StatusPrisustva")] Prisustvo prisustvo)
         {
+            if (prisustvo.TrajanjeUcenja < 0)
+            {
+                ModelState.AddModelError("TrajanjeUcenja", "Trajanje učenja ne može biti negativno.");
+            }
+
             if (ModelState.IsValid)
             {
-                _context.Add(prisustvo);
+                _context.Prisustva.Add(prisustvo);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -102,6 +138,11 @@ namespace StudyBuddyApp.Controllers
             if (id != prisustvo.IdPrisustva)
             {
                 return NotFound();
+            }
+
+            if (prisustvo.TrajanjeUcenja < 0)
+            {
+                ModelState.AddModelError("TrajanjeUcenja", "Trajanje učenja ne može biti negativno.");
             }
 
             if (ModelState.IsValid)

@@ -57,19 +57,31 @@
                     @Html.DisplayFor(modelItem => item.TipObavjestenja)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Procitano)
+                    @if (item.Procitano)
+                    {
+                        <span>Pročitano</span>
+                    }
+                    else
+                    {
+                        <span>Nepročitano</span>
+                    }
                 </td>
                 <td>
-                    @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.IdObavjestenja">Edit</a>
-                        <span>|</span>
-                    }
-
                     <a asp-action="Details" asp-route-id="@item.IdObavjestenja">Details</a>
 
+                    @if (!item.Procitano)
+                    {
+                        <span>|</span>
+                        <form asp-action="OznaciKaoProcitano" asp-route-id="@item.IdObavjestenja" method="post" style="display:inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link p-0">Označi kao pročitano</button>
+                        </form>
+                    }
+
                     @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
                     {
+                        <span>|</span>
+                        <a asp-action="Edit" asp-route-id="@item.IdObavjestenja">Edit</a>
                         <span>|</span>
                         <a asp-action="Delete" asp-route-id="@item.IdObavjestenja">Delete</a>
                     }
