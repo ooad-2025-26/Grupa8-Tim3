@@ -95,6 +95,7 @@
     gap: 12px;
     flex-wrap: wrap;
     align-items: center;
+    margin-top: 1.4rem;
 }
 
     .details-actions form {
@@ -145,3 +146,9 @@
         color: var(--sb-muted);
         font-size: 1.03rem;
     }
+
+.delete-card .alert {
+    margin-top: 1rem;
+    border-radius: 18px;
+    font-weight: 800;
+}

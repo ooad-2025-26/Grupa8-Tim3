@@ -32,6 +32,8 @@ namespace StudyBuddyApp.Controllers
 
         public async Task<IActionResult> Index(
             string? pretraga,
+            GodinaStudija? godinaStudija,
+            SmjerStudija? smjerStudija,
             [FromQuery] int? predmetId,
             StatusSesije? statusSesije,
             bool samoSlobodnaMjesta = false,
@@ -52,6 +54,16 @@ namespace StudyBuddyApp.Controllers
                     s.Opis.ToLower().Contains(pojam) ||
                     s.Predmet!.Naziv.ToLower().Contains(pojam) ||
                     s.Lokacija!.Naziv.ToLower().Contains(pojam));
+            }
+
+            if (godinaStudija.HasValue)
+            {
+                sesije = sesije.Where(s => s.Predmet!.GodinaStudija == godinaStudija.Value);
+            }
+
+            if (smjerStudija.HasValue)
+            {
+                sesije = sesije.Where(s => s.Predmet!.SmjerStudija == smjerStudija.Value);
             }
 
             if (predmetId.HasValue)
@@ -79,12 +91,26 @@ namespace StudyBuddyApp.Controllers
             };
 
             ViewBag.Pretraga = pretraga;
+            ViewBag.GodinaStudija = godinaStudija?.ToString();
+            ViewBag.SmjerStudija = smjerStudija?.ToString();
             ViewBag.PredmetId = predmetId;
             ViewBag.StatusSesijeOdabrano = statusSesije;
             ViewBag.SamoSlobodnaMjesta = samoSlobodnaMjesta;
             ViewBag.Sortiranje = sortiranje;
 
-            ViewBag.Predmeti = await _context.Predmeti
+            var predmetiZaFilter = _context.Predmeti.AsQueryable();
+
+            if (godinaStudija.HasValue)
+            {
+                predmetiZaFilter = predmetiZaFilter.Where(p => p.GodinaStudija == godinaStudija.Value);
+            }
+
+            if (smjerStudija.HasValue)
+            {
+                predmetiZaFilter = predmetiZaFilter.Where(p => p.SmjerStudija == smjerStudija.Value);
+            }
+
+            ViewBag.Predmeti = await predmetiZaFilter
                 .OrderBy(p => p.Naziv)
                 .ToListAsync();
 
@@ -116,6 +142,33 @@ namespace StudyBuddyApp.Controllers
             );
 
             return View(await sesije.ToListAsync());
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPredmetiByGodinaISmjer(GodinaStudija? godinaStudija, SmjerStudija? smjerStudija)
+        {
+            var predmeti = _context.Predmeti.AsQueryable();
+
+            if (godinaStudija.HasValue)
+            {
+                predmeti = predmeti.Where(p => p.GodinaStudija == godinaStudija.Value);
+            }
+
+            if (smjerStudija.HasValue)
+            {
+                predmeti = predmeti.Where(p => p.SmjerStudija == smjerStudija.Value);
+            }
+
+            var rezultat = await predmeti
+                .OrderBy(p => p.Naziv)
+                .Select(p => new
+                {
+                    id = p.IdPredmeta,
+                    naziv = p.Naziv
+                })
+                .ToListAsync();
+
+            return Json(rezultat);
         }
 
         public async Task<IActionResult> Details(int? id)

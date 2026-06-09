@@ -29,10 +29,16 @@
                 <span asp-validation-for="Oznaka" class="text-danger"></span>
             </div>
 
-            <div class="form-group form-full">
-                <label asp-for="Opis" class="control-label">Opis</label>
-                <textarea asp-for="Opis" class="form-control" rows="4" placeholder="Ukratko opiši šta se obrađuje iz ovog predmeta."></textarea>
-                <span asp-validation-for="Opis" class="text-danger"></span>
+            <div class="form-group">
+                <label asp-for="GodinaStudija" class="control-label">Godina studija</label>
+                <select asp-for="GodinaStudija" class="form-select" asp-items="Html.GetEnumSelectList<GodinaStudija>()"></select>
+                <span asp-validation-for="GodinaStudija" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SmjerStudija" class="control-label">Smjer studija</label>
+                <select asp-for="SmjerStudija" class="form-select" asp-items="Html.GetEnumSelectList<SmjerStudija>()"></select>
+                <span asp-validation-for="SmjerStudija" class="text-danger"></span>
             </div>
 
             <div class="form-group form-full">

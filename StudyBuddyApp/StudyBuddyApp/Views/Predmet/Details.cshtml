@@ -1,42 +1,61 @@
 ﻿@model StudyBuddyApp.Models.Predmet
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji predmeta";
+    var statusClass = Model.StatusPredmeta.ToString() == "Aktivan" ? "status-active" : "status-muted";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Predmet</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Naziv)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Naziv)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Opis)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Opis)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Oznaka)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Oznaka)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusPredmeta)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StatusPredmeta)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji predmeta</h1>
+        <p>Pregled osnovnih informacija o predmetu.</p>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdPredmeta">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="details-card">
+    <div class="session-card-top">
+        <span class="session-subject">@Model.Oznaka</span>
+        <span class="session-status @statusClass">@Model.StatusPredmeta</span>
+    </div>
+
+    <h2>@Model.Naziv</h2>
+
+    <div class="details-info">
+        <div>
+            <span>Godina studija</span>
+            <strong>@Model.GodinaStudija</strong>
+        </div>
+
+        <div>
+            <span>Smjer studija</span>
+            <strong>@Model.SmjerStudija</strong>
+        </div>
+
+        <div>
+            <span>Oznaka</span>
+            <strong>@Model.Oznaka</strong>
+        </div>
+
+        <div>
+            <span>Status</span>
+            <strong>@Model.StatusPredmeta</strong>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.IdPredmeta" class="btn btn-secondary">
+                Uredi
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.IdPredmeta" class="btn btn-danger">
+                Obriši
+            </a>
+        }
+
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na predmete
+        </a>
+    </div>
 </div>

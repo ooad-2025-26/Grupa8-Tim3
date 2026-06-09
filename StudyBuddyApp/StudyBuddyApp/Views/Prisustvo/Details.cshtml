@@ -1,42 +1,70 @@
 ﻿@model StudyBuddyApp.Models.Prisustvo
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji prisustva";
+    var statusClass = Model.StatusPrisustva.ToString() == "Prisutan" ? "status-active" : "status-muted";
+    var korisnikIme = Model.Korisnik != null
+        ? $"{Model.Korisnik.Ime} {Model.Korisnik.Prezime}"
+        : "Nepoznat korisnik";
+    var nazivSesije = Model.SesijaUcenja?.Naziv ?? "Nepoznata sesija";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Prisustvo</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Korisnik)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Korisnik.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SesijaUcenja)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SesijaUcenja.IdSesije)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TrajanjeUcenja)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TrajanjeUcenja)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusPrisustva)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StatusPrisustva)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji prisustva</h1>
+        <p>Pregled evidentiranog prisustva za odabranu sesiju učenja.</p>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdPrisustva">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="details-card">
+    <div class="session-card-top">
+        <span class="session-subject">@nazivSesije</span>
+        <span class="session-status @statusClass">@Model.StatusPrisustva</span>
+    </div>
+
+    <h2>@korisnikIme</h2>
+
+    <div class="details-info">
+        <div>
+            <span>Korisnik</span>
+            <strong>@korisnikIme</strong>
+        </div>
+
+        <div>
+            <span>Email</span>
+            <strong>@(Model.Korisnik?.Email ?? "Nije dostupan")</strong>
+        </div>
+
+        <div>
+            <span>Sesija učenja</span>
+            <strong>@nazivSesije</strong>
+        </div>
+
+        <div>
+            <span>Trajanje učenja</span>
+            <strong>@Model.TrajanjeUcenja min</strong>
+        </div>
+
+        <div>
+            <span>Status prisustva</span>
+            <strong>@Model.StatusPrisustva</strong>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.IdPrisustva" class="btn btn-secondary">
+                Uredi
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.IdPrisustva" class="btn btn-danger">
+                Obriši
+            </a>
+        }
+
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na prisustva
+        </a>
+    </div>
 </div>

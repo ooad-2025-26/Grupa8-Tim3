@@ -15,6 +15,10 @@ namespace StudyBuddyApp.Models
 
         public string Oznaka { get; set; } = string.Empty;
 
+        public GodinaStudija GodinaStudija { get; set; }
+
+        public SmjerStudija SmjerStudija { get; set; }
+
         public StatusPredmeta StatusPredmeta { get; set; }
     }
 }

@@ -2,53 +2,66 @@
 
 @{
     ViewData["Title"] = "Detalji korisnika";
+    var punoIme = $"{Model.Ime} {Model.Prezime}";
+    var statusClass = Model.StatusNaloga.ToString() == "Aktivan" ? "status-active" : "status-muted";
 }
 
-<h1>Detalji korisnika</h1>
-
-<div>
-    <h4>Korisnik</h4>
-    <hr />
-
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Ime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Ime)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Prezime)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Prezime)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Uloga)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Uloga)
-        </dd>
-
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusNaloga)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StatusNaloga)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji korisnika</h1>
+        <p>Pregled osnovnih informacija o korisničkom nalogu.</p>
+    </div>
 </div>
 
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<div class="details-card">
+    <div class="session-card-top">
+        <span class="session-subject">@Model.Uloga</span>
+        <span class="session-status @statusClass">@Model.StatusNaloga</span>
+    </div>
+
+    <h2>@punoIme</h2>
+
+    <div class="details-info">
+        <div>
+            <span>Ime</span>
+            <strong>@Model.Ime</strong>
+        </div>
+
+        <div>
+            <span>Prezime</span>
+            <strong>@Model.Prezime</strong>
+        </div>
+
+        <div>
+            <span>Email</span>
+            <strong>@Model.Email</strong>
+        </div>
+
+        <div>
+            <span>Uloga</span>
+            <strong>@Model.Uloga</strong>
+        </div>
+
+        <div>
+            <span>Status naloga</span>
+            <strong>@Model.StatusNaloga</strong>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-secondary">
+                Uredi
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                Obriši
+            </a>
+        }
+
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na korisnike
+        </a>
+    </div>
 </div>

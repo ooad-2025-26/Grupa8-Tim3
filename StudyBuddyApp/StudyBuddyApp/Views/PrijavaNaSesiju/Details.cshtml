@@ -1,42 +1,71 @@
 ﻿@model StudyBuddyApp.Models.PrijavaNaSesiju
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji prijave";
+    var statusClass = Model.StatusPrijave.ToString() == "Prijavljen" ? "status-active" : "status-muted";
+    var korisnikIme = Model.Korisnik != null
+        ? $"{Model.Korisnik.Ime} {Model.Korisnik.Prezime}"
+        : "Nepoznat korisnik";
+    var nazivSesije = Model.SesijaUcenja?.Naziv ?? "Nepoznata sesija";
+    var datumPrijave = Model.DatumPrijave.ToLocalTime().ToString("dd.MM.yyyy. HH:mm");
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>PrijavaNaSesiju</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DatumPrijave)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DatumPrijave)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Korisnik)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Korisnik.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SesijaUcenja)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SesijaUcenja.IdSesije)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusPrijave)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.StatusPrijave)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji prijave</h1>
+        <p>Pregled prijave korisnika na sesiju učenja.</p>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdPrijave">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="details-card">
+    <div class="session-card-top">
+        <span class="session-subject">@nazivSesije</span>
+        <span class="session-status @statusClass">@Model.StatusPrijave</span>
+    </div>
+
+    <h2>@korisnikIme</h2>
+
+    <div class="details-info">
+        <div>
+            <span>Korisnik</span>
+            <strong>@korisnikIme</strong>
+        </div>
+
+        <div>
+            <span>Email</span>
+            <strong>@(Model.Korisnik?.Email ?? "Nije dostupan")</strong>
+        </div>
+
+        <div>
+            <span>Sesija učenja</span>
+            <strong>@nazivSesije</strong>
+        </div>
+
+        <div>
+            <span>Datum prijave</span>
+            <strong>@datumPrijave</strong>
+        </div>
+
+        <div>
+            <span>Status prijave</span>
+            <strong>@Model.StatusPrijave</strong>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.IdPrijave" class="btn btn-secondary">
+                Uredi
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.IdPrijave" class="btn btn-danger">
+                Obriši
+            </a>
+        }
+
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na prijave
+        </a>
+    </div>
 </div>

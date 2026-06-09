@@ -1,30 +1,51 @@
 ﻿@model StudyBuddyApp.Models.Uloga
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji uloge";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Uloga</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Naziv)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Naziv)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Opis)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Opis)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji uloge</h1>
+        <p>Pregled osnovnih informacija o korisničkoj ulozi.</p>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdUloge">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="details-card">
+    <div class="session-card-top">
+        <span class="session-subject">Uloga</span>
+    </div>
+
+    <h2>@Model.Naziv</h2>
+
+    <div class="details-info">
+        <div>
+            <span>Naziv</span>
+            <strong>@Model.Naziv</strong>
+        </div>
+
+        <div>
+            <span>Opis</span>
+            <strong>
+                @(string.IsNullOrWhiteSpace(Model.Opis) ? "Nije unesen" : Model.Opis)
+            </strong>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.IdUloge" class="btn btn-secondary">
+                Uredi
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.IdUloge" class="btn btn-danger">
+                Obriši
+            </a>
+        }
+
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na uloge
+        </a>
+    </div>
 </div>

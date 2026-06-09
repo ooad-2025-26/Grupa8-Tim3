@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<StudyBuddyApp.Models.Predmet>
+@using StudyBuddyApp.Models
 
 @{
     ViewData["Title"] = "Predmeti";
@@ -16,6 +17,80 @@
     }
 </div>
 
+<div class="session-filter-card">
+    <form asp-controller="Predmet" asp-action="Index" method="get">
+        <div class="session-filter-grid">
+            <div class="form-group filter-search">
+                <label class="control-label">Pretraga</label>
+                <input type="text"
+                       name="pretraga"
+                       value="@ViewBag.Pretraga"
+                       class="form-control"
+                       placeholder="Pretraži naziv, oznaku ili opis predmeta..." />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Godina studija</label>
+                <select name="godinaStudija" class="form-select">
+                    <option value="">Sve godine</option>
+                    @foreach (GodinaStudija godina in Enum.GetValues(typeof(GodinaStudija)))
+                    {
+                        if (ViewBag.GodinaStudija == godina.ToString())
+                        {
+                            <option value="@godina" selected>@godina</option>
+                        }
+                        else
+                        {
+                            <option value="@godina">@godina</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Smjer studija</label>
+                <select name="smjerStudija" class="form-select">
+                    <option value="">Svi smjerovi</option>
+                    @foreach (SmjerStudija smjer in Enum.GetValues(typeof(SmjerStudija)))
+                    {
+                        if (ViewBag.SmjerStudija == smjer.ToString())
+                        {
+                            <option value="@smjer" selected>@smjer</option>
+                        }
+                        else
+                        {
+                            <option value="@smjer">@smjer</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <select name="statusPredmeta" class="form-select">
+                    <option value="">Svi statusi</option>
+                    @foreach (StatusPredmeta status in Enum.GetValues(typeof(StatusPredmeta)))
+                    {
+                        if (ViewBag.StatusPredmeta == status.ToString())
+                        {
+                            <option value="@status" selected>@status</option>
+                        }
+                        else
+                        {
+                            <option value="@status">@status</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary-sb">Primijeni filtere</button>
+            <a asp-controller="Predmet" asp-action="Index" class="btn btn-outline-sb">Poništi sve filtere</a>
+        </div>
+    </form>
+</div>
+
 @if (!Model.Any())
 {
     <div class="empty-state">
@@ -30,8 +105,9 @@ else
             <thead>
                 <tr>
                     <th>Naziv</th>
-                    <th>Opis</th>
                     <th>Oznaka</th>
+                    <th>Godina</th>
+                    <th>Smjer</th>
                     <th>Status</th>
                     <th>Akcije</th>
                 </tr>
@@ -39,15 +115,19 @@ else
             <tbody>
                 @foreach (var item in Model)
                 {
-                    var opis = item.Opis?.Length > 90 ? item.Opis.Substring(0, 90) + "..." : item.Opis;
                     var statusClass = item.StatusPredmeta.ToString() == "Aktivan" ? "status-active" : "status-muted";
 
                     <tr>
                         <td>@item.Naziv</td>
-                        <td>@opis</td>
+
                         <td>
                             <span class="session-subject">@item.Oznaka</span>
                         </td>
+
+                        <td>@item.GodinaStudija</td>
+
+                        <td>@item.SmjerStudija</td>
+
                         <td>
                             <span class="session-status @statusClass">
                                 @item.StatusPredmeta

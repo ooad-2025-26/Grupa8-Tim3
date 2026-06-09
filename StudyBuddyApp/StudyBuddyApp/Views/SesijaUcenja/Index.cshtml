@@ -38,6 +38,42 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label">Godina studija</label>
+                <select name="godinaStudija" class="form-select">
+                    <option value="">Sve godine</option>
+                    @foreach (GodinaStudija godina in Enum.GetValues(typeof(GodinaStudija)))
+                    {
+                        if (ViewBag.GodinaStudija == godina.ToString())
+                        {
+                            <option value="@godina" selected>@godina</option>
+                        }
+                        else
+                        {
+                            <option value="@godina">@godina</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Smjer studija</label>
+                <select name="smjerStudija" class="form-select">
+                    <option value="">Svi smjerovi</option>
+                    @foreach (SmjerStudija smjer in Enum.GetValues(typeof(SmjerStudija)))
+                    {
+                        if (ViewBag.SmjerStudija == smjer.ToString())
+                        {
+                            <option value="@smjer" selected>@smjer</option>
+                        }
+                        else
+                        {
+                            <option value="@smjer">@smjer</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label class="control-label">Predmet</label>
                 <select name="predmetId" id="predmetId" class="form-select">
                     <option value="">Svi predmeti</option>

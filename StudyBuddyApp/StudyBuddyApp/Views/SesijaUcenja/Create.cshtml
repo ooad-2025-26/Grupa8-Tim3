@@ -42,9 +42,31 @@
             </div>
 
             <div class="form-group">
+                <label class="control-label">Godina studija</label>
+                <select id="godinaStudijaFilter" class="form-select">
+                    <option value="">Odaberi godinu</option>
+                    @foreach (GodinaStudija godina in Enum.GetValues(typeof(GodinaStudija)))
+                    {
+                        <option value="@godina">@godina</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Smjer studija</label>
+                <select id="smjerStudijaFilter" class="form-select">
+                    <option value="">Odaberi smjer</option>
+                    @foreach (SmjerStudija smjer in Enum.GetValues(typeof(SmjerStudija)))
+                    {
+                        <option value="@smjer">@smjer</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
                 <label asp-for="PredmetId" class="control-label">Predmet</label>
-                <select asp-for="PredmetId" class="form-select" asp-items="ViewBag.PredmetId">
-                    <option value="">-- Odaberite predmet --</option>
+                <select asp-for="PredmetId" class="form-select" id="predmetSelect">
+                    <option value="">Prvo odaberi godinu i smjer</option>
                 </select>
                 <span asp-validation-for="PredmetId" class="text-danger"></span>
             </div>
@@ -81,4 +103,42 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        const godinaSelect = document.getElementById("godinaStudijaFilter");
+        const smjerSelect = document.getElementById("smjerStudijaFilter");
+        const predmetSelect = document.getElementById("predmetSelect");
+
+        async function ucitajPredmete() {
+            const godina = godinaSelect.value;
+            const smjer = smjerSelect.value;
+
+            predmetSelect.innerHTML = "";
+
+            if (!godina || !smjer) {
+                predmetSelect.innerHTML = '<option value="">Prvo odaberi godinu i smjer</option>';
+                return;
+            }
+
+            const response = await fetch(`/SesijaUcenja/GetPredmetiByGodinaISmjer?godinaStudija=${godina}&smjerStudija=${smjer}`);
+            const predmeti = await response.json();
+
+            if (predmeti.length === 0) {
+                predmetSelect.innerHTML = '<option value="">Nema predmeta za odabranu godinu i smjer</option>';
+                return;
+            }
+
+            predmetSelect.innerHTML = '<option value="">Odaberi predmet</option>';
+
+            predmeti.forEach(predmet => {
+                const option = document.createElement("option");
+                option.value = predmet.id;
+                option.textContent = predmet.naziv;
+                predmetSelect.appendChild(option);
+            });
+        }
+
+        godinaSelect.addEventListener("change", ucitajPredmete);
+        smjerSelect.addEventListener("change", ucitajPredmete);
+    </script>
 }

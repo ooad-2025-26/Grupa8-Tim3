@@ -16,10 +16,49 @@ namespace StudyBuddyApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
-
+        public async Task<IActionResult> Index(
+            string? pretraga,
+            GodinaStudija? godinaStudija,
+            SmjerStudija? smjerStudija,
+            StatusPredmeta? statusPredmeta)
         {
-            return View(await _context.Predmeti.ToListAsync());
+            var predmeti = _context.Predmeti.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pretraga))
+            {
+                var pojam = pretraga.ToLower();
+
+                predmeti = predmeti.Where(p =>
+                    p.Naziv.ToLower().Contains(pojam) ||
+                    p.Opis.ToLower().Contains(pojam) ||
+                    p.Oznaka.ToLower().Contains(pojam));
+            }
+
+            if (godinaStudija.HasValue)
+            {
+                predmeti = predmeti.Where(p => p.GodinaStudija == godinaStudija.Value);
+            }
+
+            if (smjerStudija.HasValue)
+            {
+                predmeti = predmeti.Where(p => p.SmjerStudija == smjerStudija.Value);
+            }
+
+            if (statusPredmeta.HasValue)
+            {
+                predmeti = predmeti.Where(p => p.StatusPredmeta == statusPredmeta.Value);
+            }
+
+            ViewBag.Pretraga = pretraga;
+            ViewBag.GodinaStudija = godinaStudija?.ToString();
+            ViewBag.SmjerStudija = smjerStudija?.ToString();
+            ViewBag.StatusPredmeta = statusPredmeta?.ToString();
+
+            return View(await predmeti
+                .OrderBy(p => p.GodinaStudija)
+                .ThenBy(p => p.SmjerStudija)
+                .ThenBy(p => p.Naziv)
+                .ToListAsync());
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -49,7 +88,7 @@ namespace StudyBuddyApp.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdPredmeta,Naziv,Opis,Oznaka,StatusPredmeta")] Predmet predmet)
+        public async Task<IActionResult> Create([Bind("IdPredmeta,Naziv,Oznaka,GodinaStudija,SmjerStudija,StatusPredmeta")] Predmet predmet)
         {
             if (ModelState.IsValid)
             {
@@ -82,7 +121,7 @@ namespace StudyBuddyApp.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdPredmeta,Naziv,Opis,Oznaka,StatusPredmeta")] Predmet predmet)
+        public async Task<IActionResult> Edit(int id, [Bind("IdPredmeta,Naziv,Oznaka,GodinaStudija,SmjerStudija,StatusPredmeta")] Predmet predmet)
         {
             if (id != predmet.IdPredmeta)
             {

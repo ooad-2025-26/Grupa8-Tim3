@@ -1,42 +1,67 @@
 ﻿@model StudyBuddyApp.Models.Lokacija
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji lokacije";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Lokacija</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Naziv)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Naziv)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipLokacije)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipLokacije)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Adresa)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Adresa)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Link)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Link)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji lokacije</h1>
+        <p>Pregled osnovnih informacija o lokaciji za sesije učenja.</p>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdLokacije">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="details-card">
+    <div class="session-card-top">
+        <span class="session-subject">@Model.TipLokacije</span>
+    </div>
+
+    <h2>@Model.Naziv</h2>
+
+    <div class="details-info">
+        <div>
+            <span>Tip lokacije</span>
+            <strong>@Model.TipLokacije</strong>
+        </div>
+
+        <div>
+            <span>Adresa</span>
+            <strong>
+                @(string.IsNullOrWhiteSpace(Model.Adresa) ? "Nije unesena" : Model.Adresa)
+            </strong>
+        </div>
+
+        <div>
+            <span>Link</span>
+            @if (!string.IsNullOrWhiteSpace(Model.Link))
+            {
+                <strong>
+                    <a href="@Model.Link" target="_blank" rel="noopener noreferrer">
+                        Otvori link
+                    </a>
+                </strong>
+            }
+            else
+            {
+                <strong>Nije unesen</strong>
+            }
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (User.IsInRole("Administrator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.IdLokacije" class="btn btn-secondary">
+                Uredi
+            </a>
+
+            <a asp-action="Delete" asp-route-id="@Model.IdLokacije" class="btn btn-danger">
+                Obriši
+            </a>
+        }
+
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na lokacije
+        </a>
+    </div>
 </div>

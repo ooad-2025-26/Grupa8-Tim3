@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
+using StudyBuddyApp.Data.Seed;
 using StudyBuddyApp.Models;
 using StudyBuddyApp.Services;
 using StudyBuddyApp.Services.Notifications;
@@ -10,7 +11,6 @@ using StudyBuddyApp.Services.Statistics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -44,7 +44,6 @@ builder.Services.AddScoped<StatistikaContext>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -73,8 +72,11 @@ app.MapRazorPages()
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider
-    .GetRequiredService<ApplicationDbContext>();
+        .GetRequiredService<ApplicationDbContext>();
+
     db.Database.Migrate();
+
+    await PredmetSeeder.SeedAsync(db);
 }
 
 app.Run();
