@@ -11,23 +11,95 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light">
+        <nav class="navbar navbar-expand-lg navbar-light">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">StudyBuddy</a>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Prikaži navigaciju">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar" aria-expanded="false" aria-label="Prikaži navigaciju">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-items-center">
+                <div id="mainNavbar" class="navbar-collapse collapse justify-content-between align-items-center">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Početna</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privatnost</a>
-                        </li>
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            @if (User.IsInRole("Student"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="SesijaUcenja" asp-action="Index">Sesije</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="PrijavaNaSesiju" asp-action="Index">Prijave</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Prisustvo" asp-action="Index">Prisustvo</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Obavjestenje" asp-action="Index">Obavještenja</a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("Moderator"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="SesijaUcenja" asp-action="Index">Sesije</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Prisustvo" asp-action="Index">Prisustvo</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Obavjestenje" asp-action="Index">Obavještenja</a>
+                                </li>
+                            }
+
+                            @if (User.IsInRole("Administrator"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="SesijaUcenja" asp-action="Index">Sesije</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="PrijavaNaSesiju" asp-action="Index">Prijave</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Prisustvo" asp-action="Index">Prisustvo</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Obavjestenje" asp-action="Index">Obavještenja</a>
+                                </li>
+
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button"
+                                           data-bs-toggle="dropdown" aria-expanded="false">
+                                        Administracija
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="adminDropdown">
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Korisnik" asp-action="Index">Korisnici</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Predmet" asp-action="Index">Predmeti</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Lokacija" asp-action="Index">Lokacije</a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Uloga" asp-action="Index">Uloge</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privatnost</a>
+                            </li>
+                        }
                     </ul>
 
                     <partial name="_LoginPartial" />

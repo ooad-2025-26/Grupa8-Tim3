@@ -18,6 +18,7 @@
             <div class="form-floating mb-3">
                 <input asp-for="Input.Email"
                        class="form-control"
+                       id="emailInput"
                        autocomplete="username"
                        aria-required="true"
                        placeholder="name@example.com" />
@@ -41,10 +42,9 @@
                 </button>
 
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
-                <small class="password-help">
+                <small id="passwordRulesMessage" class="password-help text-danger">
                     Lozinka treba imati najmanje 7 karaktera, jedno veliko slovo, jedan broj i jedan specijalni znak.
                 </small>
-                <span id="passwordRulesMessage" class="text-danger password-match-message"></span>
             </div>
 
             <div class="mb-3 password-field">
@@ -63,10 +63,10 @@
                 </button>
 
                 <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-                <span id="passwordMatchMessage" class="text-danger password-match-message"></span>
+                <span id="passwordMatchMessage" class="password-match-message text-danger"></span>
             </div>
 
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-primary-sb">
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-primary-sb" disabled>
                 Registruj se
             </button>
 
@@ -97,6 +97,7 @@
             }
         }
 
+        const emailInput = document.getElementById("emailInput");
         const passwordInput = document.getElementById("passwordInput");
         const confirmPasswordInput = document.getElementById("confirmPasswordInput");
         const passwordRulesMessage = document.getElementById("passwordRulesMessage");
@@ -112,42 +113,53 @@
             return imaMinimalnuDuzinu && imaVelikoSlovo && imaBroj && imaSpecijalniZnak;
         }
 
-        function provjeriLozinku() {
+        function emailJeValidan(email) {
+            return /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email);
+        }
+
+        function provjeriFormu() {
+            const email = emailInput.value.trim();
             const lozinka = passwordInput.value;
             const potvrda = confirmPasswordInput.value;
 
-            passwordRulesMessage.textContent = "";
-            passwordMatchMessage.textContent = "";
+            const emailOk = emailJeValidan(email);
+            const lozinkaOk = lozinkaIspunjavaPravila(lozinka);
+            const potvrdaUnesena = potvrda.length > 0;
+            const lozinkeIste = lozinka === potvrda;
+
             passwordInput.classList.remove("is-invalid");
             confirmPasswordInput.classList.remove("is-invalid");
-            registerSubmit.disabled = false;
 
-            if (potvrda.length === 0) {
-                return;
-            }
-
-            if (!lozinkaIspunjavaPravila(lozinka)) {
-                passwordRulesMessage.textContent = "Lozinka ne ispunjava sva pravila.";
+            if (lozinka.length === 0) {
+                passwordRulesMessage.textContent = "";
+                passwordRulesMessage.classList.remove("text-success", "text-danger");
+            } else if (!lozinkaOk) {
+                passwordRulesMessage.textContent = "Lozinka treba imati najmanje 7 karaktera, jedno veliko slovo, jedan broj i jedan specijalni znak.";
+                passwordRulesMessage.classList.remove("text-success");
+                passwordRulesMessage.classList.add("text-danger");
                 passwordInput.classList.add("is-invalid");
-                registerSubmit.disabled = true;
-                return;
+            } else {
+                passwordRulesMessage.textContent = "Lozinka ispunjava uslove.";
+                passwordRulesMessage.classList.remove("text-danger");
+                passwordRulesMessage.classList.add("text-success");
             }
 
-            if (lozinka !== potvrda) {
+            if (!potvrdaUnesena) {
+                passwordMatchMessage.textContent = "";
+            } else if (!lozinkeIste) {
                 passwordMatchMessage.textContent = "Lozinke se ne poklapaju.";
                 confirmPasswordInput.classList.add("is-invalid");
-                registerSubmit.disabled = true;
-                return;
+            } else {
+                passwordMatchMessage.textContent = "";
             }
+
+            registerSubmit.disabled = !(emailOk && lozinkaOk && potvrdaUnesena && lozinkeIste);
         }
 
-        confirmPasswordInput.addEventListener("input", provjeriLozinku);
-        confirmPasswordInput.addEventListener("focus", provjeriLozinku);
+        emailInput.addEventListener("input", provjeriFormu);
+        passwordInput.addEventListener("input", provjeriFormu);
+        confirmPasswordInput.addEventListener("input", provjeriFormu);
 
-        passwordInput.addEventListener("input", function () {
-            if (confirmPasswordInput.value.length > 0) {
-                provjeriLozinku();
-            }
-        });
+        provjeriFormu();
     </script>
 }

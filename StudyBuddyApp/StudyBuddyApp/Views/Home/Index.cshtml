@@ -2,20 +2,132 @@
     ViewData["Title"] = "Početna";
 }
 
-<div class="home-wrapper">
-    <section class="hero-section">
-        <div class="hero-card">
-            <div class="home-brand-badge">StudyBuddy</div>
-            <h1 class="hero-title">Sistem za zajedničko učenje</h1>
-            <p class="hero-text">
-                Kreiraj sesije učenja, prijavi se na postojeće termine, prati prisustvo
-                i primaj obavještenja na jednom mjestu.
-            </p>
+@if (User.Identity == null || !User.Identity.IsAuthenticated)
+{
+    <div class="home-wrapper">
+        <section class="hero-section">
+            <div class="hero-card">
+                <div class="home-brand-badge">StudyBuddy</div>
+                <h1 class="hero-title">Sistem za zajedničko učenje</h1>
+                <p class="hero-text">
+                    Kreiraj sesije učenja, prijavi se na postojeće termine, prati prisustvo
+                    i primaj obavještenja na jednom mjestu.
+                </p>
 
-            <div class="hero-actions">
-                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary-sb">Prijava</a>
-                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-sb">Registracija</a>
+                <div class="hero-actions">
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary-sb">Prijava</a>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-outline-sb">Registracija</a>
+                </div>
+            </div>
+        </section>
+    </div>
+}
+else
+{
+    <div class="dashboard-page">
+        <div class="dashboard-header">
+            <div>
+                <span class="dashboard-eyebrow">StudyBuddy</span>
+                <h1>Dobrodošli nazad!</h1>
+                <p>Izaberi jednu od dostupnih aktivnosti i nastavi rad u sistemu.</p>
             </div>
         </div>
-    </section>
-</div>
+
+        @if (User.IsInRole("Student"))
+        {
+            <div class="dashboard-grid">
+                <a asp-controller="SesijaUcenja" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📚</span>
+                    <h2>Pregled sesija</h2>
+                    <p>Pronađi aktivne sesije učenja i pogledaj detalje termina.</p>
+                </a>
+
+                <a asp-controller="SesijaUcenja" asp-action="Create" class="dashboard-card">
+                    <span class="dashboard-icon">➕</span>
+                    <h2>Kreiraj sesiju</h2>
+                    <p>Organizuj novu sesiju učenja za odabrani predmet.</p>
+                </a>
+
+                <a asp-controller="PrijavaNaSesiju" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">✅</span>
+                    <h2>Moje prijave</h2>
+                    <p>Pregledaj svoje prijave i statuse prijava na sesije.</p>
+                </a>
+
+                <a asp-controller="Obavjestenje" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">🔔</span>
+                    <h2>Obavještenja</h2>
+                    <p>Prati informacije o prijavama, otkazivanjima i promjenama.</p>
+                </a>
+
+                <a asp-controller="Prisustvo" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📝</span>
+                    <h2>Prisustvo</h2>
+                    <p>Pregledaj evidentirano prisustvo na sesijama učenja.</p>
+                </a>
+            </div>
+        }
+        else if (User.IsInRole("Moderator"))
+        {
+            <div class="dashboard-grid">
+                <a asp-controller="SesijaUcenja" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📚</span>
+                    <h2>Pregled sesija</h2>
+                    <p>Pregledaj sve aktivne i završene sesije učenja.</p>
+                </a>
+
+                <a asp-controller="Prisustvo" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📝</span>
+                    <h2>Evidencija prisustva</h2>
+                    <p>Dodaj ili uredi prisustvo učesnika na sesijama.</p>
+                </a>
+
+                <a asp-controller="Obavjestenje" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">🔔</span>
+                    <h2>Obavještenja</h2>
+                    <p>Kreiraj i prati obavještenja za korisnike sistema.</p>
+                </a>
+            </div>
+        }
+        else if (User.IsInRole("Administrator"))
+        {
+            <div class="dashboard-grid">
+                <a asp-controller="SesijaUcenja" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📚</span>
+                    <h2>Sesije</h2>
+                    <p>Pregledaj, uredi i upravljaj sesijama učenja.</p>
+                </a>
+
+                <a asp-controller="Korisnik" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">👥</span>
+                    <h2>Korisnici</h2>
+                    <p>Upravljaj korisnicima i njihovim nalozima.</p>
+                </a>
+
+                <a asp-controller="Predmet" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📖</span>
+                    <h2>Predmeti</h2>
+                    <p>Dodaj, uredi ili deaktiviraj predmete u sistemu.</p>
+                </a>
+
+                <a asp-controller="Lokacija" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📍</span>
+                    <h2>Lokacije</h2>
+                    <p>Upravljaj fizičkim i online lokacijama sesija.</p>
+                </a>
+
+                <a asp-controller="PrijavaNaSesiju" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">✅</span>
+                    <h2>Prijave</h2>
+                    <p>Pregledaj prijave korisnika na sesije učenja.</p>
+                </a>
+
+                <a asp-controller="Obavjestenje" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">🔔</span>
+                    <h2>Obavještenja</h2>
+                    <p>Pregledaj i upravljaj obavještenjima u sistemu.</p>
+                </a>
+            </div>
+        }
+    </div>
+}

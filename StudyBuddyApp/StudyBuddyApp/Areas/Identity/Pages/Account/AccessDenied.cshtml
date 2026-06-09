@@ -1,10 +1,28 @@
 ﻿@page
 @model AccessDeniedModel
+
 @{
-    ViewData["Title"] = "Access denied";
+    ViewData["Title"] = "Pristup odbijen";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="auth-page">
+    <div class="auth-card access-card">
+        <div class="auth-header">
+            <div class="access-icon">!</div>
+            <h1>Pristup odbijen</h1>
+            <p>
+                Nemaš dozvolu za pristup ovoj stranici.
+            </p>
+        </div>
+
+        <div class="access-actions">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-primary-sb">
+                Početna
+            </a>
+
+            <a asp-area="" asp-controller="SesijaUcenja" asp-action="Index" class="btn btn-outline-sb">
+                Nazad na sesije
+            </a>
+        </div>
+    </div>
+</div>

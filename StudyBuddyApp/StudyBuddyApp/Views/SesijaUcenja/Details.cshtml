@@ -5,9 +5,19 @@
     ViewData["Title"] = "Detalji sesije";
     bool vecPrijavljen = ViewBag.VecPrijavljen == true;
     int? idPrijave = ViewBag.IdPrijave as int?;
+
+    var datum = Model.DatumVrijeme.ToLocalTime().ToString("dd.MM.yyyy.");
+    var vrijeme = Model.DatumVrijeme.ToLocalTime().ToString("HH:mm");
+    var popunjeno = Model.MaksimalanBrojUcesnika - Model.BrojSlobodnihMjesta;
+    var statusClass = Model.StatusSesije == StatusSesije.Aktivna ? "status-active" : "status-muted";
 }
 
-<h1>Detalji sesije</h1>
+<div class="page-header">
+    <div>
+        <h1>Detalji sesije</h1>
+        <p>Pregled informacija o sesiji i prijava na termin.</p>
+    </div>
+</div>
 
 @if (TempData["Poruka"] != null)
 {
@@ -23,106 +33,103 @@
     </div>
 }
 
-<div>
-    <h4>Sesija učenja</h4>
-    <hr />
+<div class="details-card">
+    <div class="details-top">
+        <div>
+            <span class="session-subject">@Model.Predmet?.Naziv</span>
+            <h2>@Model.Naziv</h2>
+        </div>
 
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Naziv)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Naziv)
-        </dd>
+        <span class="session-status @statusClass">
+            @Model.StatusSesije
+        </span>
+    </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Opis)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Opis)
-        </dd>
+    <div class="details-meta-grid">
+        <div class="details-meta-item">
+            <span>Datum</span>
+            <strong>@datum</strong>
+        </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.DatumVrijeme)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.DatumVrijeme)
-        </dd>
+        <div class="details-meta-item">
+            <span>Vrijeme</span>
+            <strong>@vrijeme</strong>
+        </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Trajanje)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Trajanje)
-        </dd>
+        <div class="details-meta-item">
+            <span>Trajanje</span>
+            <strong>@Model.Trajanje min</strong>
+        </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Lokacija)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Lokacija!.Naziv)
-        </dd>
+        <div class="details-meta-item">
+            <span>Kapacitet</span>
+            <strong>@popunjeno/@Model.MaksimalanBrojUcesnika</strong>
+        </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Predmet)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Predmet!.Naziv)
-        </dd>
+        <div class="details-meta-item">
+            <span>Slobodna mjesta</span>
+            <strong>@Model.BrojSlobodnihMjesta</strong>
+        </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Kreator)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Kreator!.Ime)
-        </dd>
+        <div class="details-meta-item">
+            <span>Lokacija</span>
+            <strong>@Model.Lokacija?.Naziv</strong>
+        </div>
+    </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.MaksimalanBrojUcesnika)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.MaksimalanBrojUcesnika)
-        </dd>
+    <div class="details-info">
+        <div>
+            <span>Organizator</span>
+            <strong>@Model.Kreator?.Ime</strong>
+        </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.BrojSlobodnihMjesta)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.BrojSlobodnihMjesta)
-        </dd>
+        <div>
+            <span>Predmet</span>
+            <strong>@Model.Predmet?.Naziv</strong>
+        </div>
+    </div>
 
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.StatusSesije)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.StatusSesije)
-        </dd>
-    </dl>
-</div>
+    <div class="details-description">
+        <h3>Opis sesije</h3>
+        <p>@Model.Opis</p>
+    </div>
 
-<div class="mb-3">
-    @if (User.IsInRole("Student"))
-    {
-        if (vecPrijavljen && idPrijave.HasValue)
+    <div class="details-actions">
+        @if (User.IsInRole("Student"))
         {
-            <form asp-action="CancelJoin" asp-route-id="@idPrijave.Value" method="post" style="display:inline">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-warning">Otkaži prijavu</button>
-            </form>
+            if (vecPrijavljen && idPrijave.HasValue)
+            {
+                <form asp-action="CancelJoin" asp-route-id="@idPrijave.Value" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning">Otkaži prijavu</button>
+                </form>
+            }
+            else if (Model.StatusSesije == StatusSesije.Aktivna && Model.BrojSlobodnihMjesta > 0)
+            {
+                <form asp-action="Join" asp-route-id="@Model.IdSesije" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success">Prijavi se</button>
+                </form>
+            }
+            else if (Model.StatusSesije != StatusSesije.Aktivna)
+            {
+                <span class="details-note">Prijava nije moguća jer sesija nije aktivna.</span>
+            }
+            else if (Model.BrojSlobodnihMjesta <= 0)
+            {
+                <span class="details-note">Sesija je popunjena.</span>
+            }
         }
-        else if (Model.StatusSesije == StatusSesije.Aktivna && Model.BrojSlobodnihMjesta > 0)
+
+        @if (User.IsInRole("Administrator"))
         {
-            <form asp-action="Join" asp-route-id="@Model.IdSesije" method="post" style="display:inline">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-success">Prijavi se</button>
-            </form>
+            <a asp-action="Edit" asp-route-id="@Model.IdSesije" class="btn btn-primary">
+                Uredi
+            </a>
         }
-    }
 
-    @if (User.IsInRole("Administrator"))
-    {
-        <a asp-action="Edit" asp-route-id="@Model.IdSesije" class="btn btn-primary">Edit</a>
-    }
-
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <a asp-action="Index" class="btn btn-outline-sb">
+            Nazad na sesije
+        </a>
+    </div>
 </div>

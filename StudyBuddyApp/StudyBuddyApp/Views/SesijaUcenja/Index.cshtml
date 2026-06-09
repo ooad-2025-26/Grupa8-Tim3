@@ -4,7 +4,17 @@
     ViewData["Title"] = "Sesije učenja";
 }
 
-<h1>Sesije učenja</h1>
+<div class="page-header">
+    <div>
+        <h1>Pregled sesija</h1>
+        <p>Pronađi dostupne sesije učenja i pridruži se aktivnim terminima.</p>
+    </div>
+
+    @if (User.IsInRole("Administrator") || User.IsInRole("Student"))
+    {
+        <a asp-action="Create" class="btn btn-primary-sb">Kreiraj sesiju</a>
+    }
+</div>
 
 @if (TempData["Poruka"] != null)
 {
@@ -13,59 +23,70 @@
     </div>
 }
 
-@if (User.IsInRole("Administrator") || User.IsInRole("Student"))
+@if (!Model.Any())
 {
-    <p>
-        <a asp-action="Create" class="btn btn-primary">Create New</a>
-    </p>
+    <div class="empty-state">
+        <h3>Nema dostupnih sesija</h3>
+        <p>Trenutno nema kreiranih sesija učenja.</p>
+    </div>
 }
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Naziv)</th>
-            <th>@Html.DisplayNameFor(model => model.Opis)</th>
-            <th>@Html.DisplayNameFor(model => model.DatumVrijeme)</th>
-            <th>@Html.DisplayNameFor(model => model.Trajanje)</th>
-            <th>@Html.DisplayNameFor(model => model.Lokacija)</th>
-            <th>@Html.DisplayNameFor(model => model.Predmet)</th>
-            <th>@Html.DisplayNameFor(model => model.Kreator)</th>
-            <th>@Html.DisplayNameFor(model => model.BrojSlobodnihMjesta)</th>
-            <th>@Html.DisplayNameFor(model => model.StatusSesije)</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+else
+{
+    <div class="session-grid">
         @foreach (var item in Model)
         {
-            var opis = item.Opis?.Length > 40 ? item.Opis.Substring(0, 40) + "..." : item.Opis;
+            var ukupnoPopunjeno = item.MaksimalanBrojUcesnika - item.BrojSlobodnihMjesta;
+            var datum = item.DatumVrijeme.ToLocalTime().ToString("dd.MM.yyyy.");
+            var vrijeme = item.DatumVrijeme.ToLocalTime().ToString("HH:mm");
+            var statusClass = item.StatusSesije.ToString() == "Aktivna" ? "status-active" : "status-muted";
 
-            <tr>
-                <td>@Html.DisplayFor(modelItem => item.Naziv)</td>
-                <td>@opis</td>
-                <td>@Html.DisplayFor(modelItem => item.DatumVrijeme)</td>
-                <td>@Html.DisplayFor(modelItem => item.Trajanje)</td>
-                <td>@Html.DisplayFor(modelItem => item.Lokacija!.Naziv)</td>
-                <td>@Html.DisplayFor(modelItem => item.Predmet!.Naziv)</td>
-                <td>@Html.DisplayFor(modelItem => item.Kreator!.Ime)</td>
-                <td>@Html.DisplayFor(modelItem => item.BrojSlobodnihMjesta)</td>
-                <td>@Html.DisplayFor(modelItem => item.StatusSesije)</td>
-                <td>
+            <div class="session-card">
+                <div class="session-card-top">
+                    <span class="session-subject">@item.Predmet?.Naziv</span>
+                    <span class="session-status @statusClass">@item.StatusSesije</span>
+                </div>
+
+                <h2>@item.Naziv</h2>
+
+                <div class="session-meta">
+                    <div>
+                        <span>Datum</span>
+                        <strong>@datum</strong>
+                    </div>
+
+                    <div>
+                        <span>Vrijeme</span>
+                        <strong>@vrijeme</strong>
+                    </div>
+
+                    <div>
+                        <span>Mjesta</span>
+                        <strong>@ukupnoPopunjeno/@item.MaksimalanBrojUcesnika</strong>
+                    </div>
+                </div>
+
+                <div class="session-extra">
+                    <span>Lokacija: <strong>@item.Lokacija?.Naziv</strong></span>
+                    <span>Organizator: <strong>@item.Kreator?.Ime</strong></span>
+                </div>
+
+                <div class="session-actions">
+                    <a asp-action="Details" asp-route-id="@item.IdSesije" class="btn btn-outline-sb">
+                        Detalji / prijava
+                    </a>
+
                     @if (User.IsInRole("Administrator"))
                     {
-                        <a asp-action="Edit" asp-route-id="@item.IdSesije">Edit</a>
-                        <span>|</span>
-                    }
+                        <a asp-action="Edit" asp-route-id="@item.IdSesije" class="btn btn-secondary">
+                            Edit
+                        </a>
 
-                    <a asp-action="Details" asp-route-id="@item.IdSesije">Detalji / prijava</a>
-
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <span>|</span>
-                        <a asp-action="Delete" asp-route-id="@item.IdSesije">Delete</a>
+                        <a asp-action="Delete" asp-route-id="@item.IdSesije" class="btn btn-danger">
+                            Delete
+                        </a>
                     }
-                </td>
-            </tr>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}
