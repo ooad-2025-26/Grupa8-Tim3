@@ -4,89 +4,83 @@
     ViewData["Title"] = "Obavještenja";
 }
 
-<h1>Obavještenja</h1>
+<div class="page-header">
+    <div>
+        <h1>Obavještenja</h1>
+        <p>Pregled informacija o prijavama, otkazivanjima i promjenama u sistemu.</p>
+    </div>
 
-@if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+    @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+    {
+        <a asp-action="Create" class="btn btn-primary-sb">Kreiraj obavještenje</a>
+    }
+</div>
+
+@if (!Model.Any())
 {
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
+    <div class="empty-state">
+        <h3>Nema obavještenja</h3>
+        <p>Trenutno nema dostupnih obavještenja za prikaz.</p>
+    </div>
 }
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Naslov)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sadrzaj)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DatumSlanja)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Korisnik)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TipObavjestenja)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Procitano)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+else
+{
+    <div class="notification-list">
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Naslov)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Sadrzaj)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DatumSlanja)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Korisnik!.Ime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TipObavjestenja)
-                </td>
-                <td>
-                    @if (item.Procitano)
-                    {
-                        <span>Pročitano</span>
-                    }
-                    else
-                    {
-                        <span>Nepročitano</span>
-                    }
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.IdObavjestenja">Details</a>
+            var procitanoClass = item.Procitano ? "notification-read" : "notification-unread";
+            var procitanoText = item.Procitano ? "Pročitano" : "Nepročitano";
+            var datum = item.DatumSlanja.ToLocalTime().ToString("dd.MM.yyyy. HH:mm");
+            var sadrzaj = item.Sadrzaj?.Length > 160 ? item.Sadrzaj.Substring(0, 160) + "..." : item.Sadrzaj;
+
+            <div class="notification-card @procitanoClass">
+                <div class="notification-main">
+                    <div class="notification-header">
+                        <div>
+                            <span class="notification-type">@item.TipObavjestenja</span>
+                            <h2>@item.Naslov</h2>
+                        </div>
+
+                        <span class="notification-status">
+                            @procitanoText
+                        </span>
+                    </div>
+
+                    <p class="notification-content">@sadrzaj</p>
+
+                    <div class="notification-meta">
+                        <span>Korisnik: <strong>@item.Korisnik?.Ime</strong></span>
+                        <span>Datum: <strong>@datum</strong></span>
+                    </div>
+                </div>
+
+                <div class="notification-actions">
+                    <a asp-action="Details" asp-route-id="@item.IdObavjestenja" class="btn btn-outline-sb">
+                        Detalji
+                    </a>
 
                     @if (!item.Procitano)
                     {
-                        <span>|</span>
-                        <form asp-action="OznaciKaoProcitano" asp-route-id="@item.IdObavjestenja" method="post" style="display:inline">
+                        <form asp-action="OznaciKaoProcitano" asp-route-id="@item.IdObavjestenja" method="post">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-link p-0">Označi kao pročitano</button>
+                            <button type="submit" class="btn btn-secondary">
+                                Označi kao pročitano
+                            </button>
                         </form>
                     }
 
                     @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
                     {
-                        <span>|</span>
-                        <a asp-action="Edit" asp-route-id="@item.IdObavjestenja">Edit</a>
-                        <span>|</span>
-                        <a asp-action="Delete" asp-route-id="@item.IdObavjestenja">Delete</a>
+                        <a asp-action="Edit" asp-route-id="@item.IdObavjestenja" class="btn btn-secondary">
+                            Uredi
+                        </a>
+
+                        <a asp-action="Delete" asp-route-id="@item.IdObavjestenja" class="btn btn-danger">
+                            Obriši
+                        </a>
                     }
-                </td>
-            </tr>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}

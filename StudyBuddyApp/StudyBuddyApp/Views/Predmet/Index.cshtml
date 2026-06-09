@@ -4,65 +4,76 @@
     ViewData["Title"] = "Predmeti";
 }
 
-<h1>Predmeti</h1>
+<div class="page-header">
+    <div>
+        <h1>Predmeti</h1>
+        <p>Pregled predmeta koji se koriste pri kreiranju sesija učenja.</p>
+    </div>
 
-@if (User.IsInRole("Administrator"))
+    @if (User.IsInRole("Administrator"))
+    {
+        <a asp-action="Create" class="btn btn-primary-sb">Dodaj predmet</a>
+    }
+</div>
+
+@if (!Model.Any())
 {
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
+    <div class="empty-state">
+        <h3>Nema predmeta</h3>
+        <p>Trenutno nema dodanih predmeta u sistemu.</p>
+    </div>
 }
+else
+{
+    <div class="table-card">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Naziv</th>
+                    <th>Opis</th>
+                    <th>Oznaka</th>
+                    <th>Status</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var opis = item.Opis?.Length > 90 ? item.Opis.Substring(0, 90) + "..." : item.Opis;
+                    var statusClass = item.StatusPredmeta.ToString() == "Aktivan" ? "status-active" : "status-muted";
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Naziv)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Opis)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Oznaka)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StatusPredmeta)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Naziv)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Opis)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Oznaka)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StatusPredmeta)
-                </td>
-                <td>
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.IdPredmeta">Edit</a>
-                        <span>|</span>
-                    }
+                    <tr>
+                        <td>@item.Naziv</td>
+                        <td>@opis</td>
+                        <td>
+                            <span class="session-subject">@item.Oznaka</span>
+                        </td>
+                        <td>
+                            <span class="session-status @statusClass">
+                                @item.StatusPredmeta
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a asp-action="Details" asp-route-id="@item.IdPredmeta" class="btn btn-outline-sb btn-sm">
+                                    Detalji
+                                </a>
 
-                    <a asp-action="Details" asp-route-id="@item.IdPredmeta">Details</a>
+                                @if (User.IsInRole("Administrator"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.IdPredmeta" class="btn btn-secondary btn-sm">
+                                        Uredi
+                                    </a>
 
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <span>|</span>
-                        <a asp-action="Delete" asp-route-id="@item.IdPredmeta">Delete</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                    <a asp-action="Delete" asp-route-id="@item.IdPredmeta" class="btn btn-danger btn-sm">
+                                        Obriši
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

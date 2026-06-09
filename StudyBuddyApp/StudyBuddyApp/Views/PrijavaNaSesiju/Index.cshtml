@@ -4,65 +4,74 @@
     ViewData["Title"] = "Prijave na sesiju";
 }
 
-<h1>Prijave na sesiju</h1>
+<div class="page-header">
+    <div>
+        <h1>Prijave na sesiju</h1>
+        <p>Pregled prijava korisnika i njihovih trenutnih statusa.</p>
+    </div>
 
-@if (User.IsInRole("Administrator"))
+    @if (User.IsInRole("Administrator"))
+    {
+        <a asp-action="Create" class="btn btn-primary-sb">Kreiraj prijavu</a>
+    }
+</div>
+
+@if (!Model.Any())
 {
-    <p>
-        <a asp-action="Create">Create New</a>
-    </p>
+    <div class="empty-state">
+        <h3>Nema prijava</h3>
+        <p>Trenutno nema evidentiranih prijava na sesije.</p>
+    </div>
 }
+else
+{
+    <div class="table-card">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Datum prijave</th>
+                    <th>Korisnik</th>
+                    <th>Sesija</th>
+                    <th>Status</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var datum = item.DatumPrijave.ToLocalTime().ToString("dd.MM.yyyy. HH:mm");
+                    var statusClass = item.StatusPrijave.ToString() == "Prijavljen" ? "status-active" : "status-muted";
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.DatumPrijave)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Korisnik)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SesijaUcenja)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StatusPrijave)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.DatumPrijave)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Korisnik!.Ime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.SesijaUcenja!.Naziv)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.StatusPrijave)
-                </td>
-                <td>
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.IdPrijave">Edit</a>
-                        <span>|</span>
-                    }
+                    <tr>
+                        <td>@datum</td>
+                        <td>@item.Korisnik?.Ime</td>
+                        <td>@item.SesijaUcenja?.Naziv</td>
+                        <td>
+                            <span class="session-status @statusClass">
+                                @item.StatusPrijave
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a asp-action="Details" asp-route-id="@item.IdPrijave" class="btn btn-outline-sb btn-sm">
+                                    Detalji
+                                </a>
 
-                    <a asp-action="Details" asp-route-id="@item.IdPrijave">Details</a>
+                                @if (User.IsInRole("Administrator"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.IdPrijave" class="btn btn-secondary btn-sm">
+                                        Uredi
+                                    </a>
 
-                    @if (User.IsInRole("Administrator"))
-                    {
-                        <span>|</span>
-                        <a asp-action="Delete" asp-route-id="@item.IdPrijave">Delete</a>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                                    <a asp-action="Delete" asp-route-id="@item.IdPrijave" class="btn btn-danger btn-sm">
+                                        Obriši
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

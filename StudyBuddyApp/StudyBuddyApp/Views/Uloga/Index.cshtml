@@ -1,41 +1,64 @@
 ﻿@model IEnumerable<StudyBuddyApp.Models.Uloga>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Uloge";
 }
 
-<h1>Index</h1>
+<div class="page-header">
+    <div>
+        <h1>Uloge</h1>
+        <p>Pregled uloga koje definišu prava pristupa korisnika u sistemu.</p>
+    </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Naziv)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Opis)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Naziv)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Opis)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.IdUloge">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.IdUloge">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.IdUloge">Delete</a>
-            </td>
-        </tr>
+    <a asp-action="Create" class="btn btn-primary-sb">Dodaj ulogu</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h3>Nema uloga</h3>
+        <p>Trenutno nema uloga za prikaz.</p>
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="table-card">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Naziv</th>
+                    <th>Opis</th>
+                    <th>Akcije</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var opis = item.Opis?.Length > 120 ? item.Opis.Substring(0, 120) + "..." : item.Opis;
+
+                    <tr>
+                        <td>
+                            <span class="session-subject">@item.Naziv</span>
+                        </td>
+                        <td>@opis</td>
+                        <td>
+                            <div class="table-actions">
+                                <a asp-action="Details" asp-route-id="@item.IdUloge" class="btn btn-outline-sb btn-sm">
+                                    Detalji
+                                </a>
+
+                                <a asp-action="Edit" asp-route-id="@item.IdUloge" class="btn btn-secondary btn-sm">
+                                    Uredi
+                                </a>
+
+                                <a asp-action="Delete" asp-route-id="@item.IdUloge" class="btn btn-danger btn-sm">
+                                    Obriši
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -5,50 +5,52 @@
     ViewData["Title"] = "Uređivanje lokacije";
 }
 
-<h1>Uređivanje lokacije</h1>
+<div class="page-header">
+    <div>
+        <h1>Uređivanje lokacije</h1>
+        <p>Izmijeni podatke za fizičku ili online lokaciju sesije učenja.</p>
+    </div>
+</div>
 
-<h4>Lokacija</h4>
-<hr />
+<div class="form-card">
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
 
-<div class="row">
-    <div class="col-md-5">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="IdLokacije" />
 
-            <input type="hidden" asp-for="IdLokacije" />
-
+        <div class="form-grid">
             <div class="form-group">
-                <label asp-for="Naziv" class="control-label"></label>
-                <input asp-for="Naziv" class="form-control" />
+                <label asp-for="Naziv" class="control-label">Naziv lokacije</label>
+                <input asp-for="Naziv" class="form-control" placeholder="Npr. Čitaonica STELEKS" />
                 <span asp-validation-for="Naziv" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="TipLokacije" class="control-label"></label>
-                <select asp-for="TipLokacije" class="form-control" asp-items="Html.GetEnumSelectList<TipLokacije>()" id="tipLokacijeSelect">
+                <label asp-for="TipLokacije" class="control-label">Tip lokacije</label>
+                <select asp-for="TipLokacije" class="form-select" asp-items="Html.GetEnumSelectList<TipLokacije>()" id="tipLokacijeSelect">
                     <option value="">-- Odaberite tip lokacije --</option>
                 </select>
                 <span asp-validation-for="TipLokacije" class="text-danger"></span>
             </div>
 
-            <div class="form-group" id="adresaPolje" style="display:none;">
-                <label asp-for="Adresa" class="control-label"></label>
-                <input asp-for="Adresa" class="form-control" />
+            <div class="form-group form-full" id="adresaPolje" style="display:none;">
+                <label asp-for="Adresa" class="control-label">Adresa</label>
+                <input asp-for="Adresa" class="form-control" placeholder="Npr. Zmaja od Bosne bb" />
                 <span asp-validation-for="Adresa" class="text-danger"></span>
             </div>
 
-            <div class="form-group" id="linkPolje" style="display:none;">
-                <label asp-for="Link" class="control-label"></label>
-                <input asp-for="Link" class="form-control" />
+            <div class="form-group form-full" id="linkPolje" style="display:none;">
+                <label asp-for="Link" class="control-label">Link</label>
+                <input asp-for="Link" class="form-control" placeholder="Npr. https://teams.microsoft.com/..." />
                 <span asp-validation-for="Link" class="text-danger"></span>
             </div>
+        </div>
 
-            <div class="form-group mt-3">
-                <input type="submit" value="Save" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-            </div>
-        </form>
-    </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-sb">Sačuvaj</button>
+            <a asp-action="Index" class="btn btn-outline-sb">Odustani</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
@@ -69,12 +71,7 @@
 
             if (odabraniTekst.includes("online")) {
                 linkPolje.style.display = "block";
-            } else if (
-                odabraniTekst.includes("fiz") ||
-                odabraniTekst.includes("učion") ||
-                odabraniTekst.includes("ucion") ||
-                odabraniTekst.includes("lokal")
-            ) {
+            } else if (odabraniTekst.includes("fiz")) {
                 adresaPolje.style.display = "block";
             }
         }

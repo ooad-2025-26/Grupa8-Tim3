@@ -1,59 +1,76 @@
 ﻿@model StudyBuddyApp.Models.Obavjestenje
+@using StudyBuddyApp.Models
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Uređivanje obavještenja";
 }
 
-<h1>Edit</h1>
-
-<h4>Obavjestenje</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdObavjestenja" />
-            <div class="form-group">
-                <label asp-for="Naslov" class="control-label"></label>
-                <input asp-for="Naslov" class="form-control" />
-                <span asp-validation-for="Naslov" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Sadrzaj" class="control-label"></label>
-                <input asp-for="Sadrzaj" class="form-control" />
-                <span asp-validation-for="Sadrzaj" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="DatumSlanja" class="control-label"></label>
-                <input asp-for="DatumSlanja" class="form-control" />
-                <span asp-validation-for="DatumSlanja" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="KorisnikId" class="control-label"></label>
-                <select asp-for="KorisnikId" class="form-control" asp-items="ViewBag.KorisnikId"></select>
-                <span asp-validation-for="KorisnikId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TipObavjestenja" class="control-label"></label>
-                <select asp-for="TipObavjestenja" class="form-control"></select>
-                <span asp-validation-for="TipObavjestenja" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Procitano" /> @Html.DisplayNameFor(model => model.Procitano)
-                </label>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="page-header">
+    <div>
+        <h1>Uređivanje obavještenja</h1>
+        <p>Izmijeni naslov, sadržaj, korisnika ili status obavještenja.</p>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="form-card">
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <input type="hidden" asp-for="IdObavjestenja" />
+
+        <div class="form-grid">
+            <div class="form-group form-full">
+                <label asp-for="Naslov" class="control-label">Naslov</label>
+                <input asp-for="Naslov" class="form-control" placeholder="Npr. Promjena termina sesije" />
+                <span asp-validation-for="Naslov" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-full">
+                <label asp-for="Sadrzaj" class="control-label">Sadržaj</label>
+                <textarea asp-for="Sadrzaj" class="form-control" rows="4" placeholder="Unesi tekst obavještenja."></textarea>
+                <span asp-validation-for="Sadrzaj" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="DatumSlanja" class="control-label">Datum slanja</label>
+                <input asp-for="DatumSlanja" class="form-control" type="datetime-local" />
+                <span asp-validation-for="DatumSlanja" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="KorisnikId" class="control-label">Korisnik</label>
+                <select asp-for="KorisnikId" class="form-select" asp-items="ViewBag.KorisnikId">
+                    <option value="">-- Odaberite korisnika --</option>
+                </select>
+                <span asp-validation-for="KorisnikId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TipObavjestenja" class="control-label">Tip obavještenja</label>
+                <select asp-for="TipObavjestenja" class="form-select" asp-items="Html.GetEnumSelectList<TipObavjestenja>()"></select>
+                <span asp-validation-for="TipObavjestenja" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <div class="form-check pretty-check">
+                    <input class="form-check-input" asp-for="Procitano" />
+                    <label class="form-check-label" asp-for="Procitano">
+                        Označi kao pročitano
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-sb">Sačuvaj</button>
+            <a asp-action="Index" class="btn btn-outline-sb">Odustani</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

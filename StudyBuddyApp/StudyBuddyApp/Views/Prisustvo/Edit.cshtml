@@ -1,49 +1,62 @@
 ﻿@model StudyBuddyApp.Models.Prisustvo
+@using StudyBuddyApp.Models
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Uređivanje prisustva";
 }
 
-<h1>Edit</h1>
-
-<h4>Prisustvo</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IdPrisustva" />
-            <div class="form-group">
-                <label asp-for="KorisnikId" class="control-label"></label>
-                <select asp-for="KorisnikId" class="form-control" asp-items="ViewBag.KorisnikId"></select>
-                <span asp-validation-for="KorisnikId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SesijaId" class="control-label"></label>
-                <select asp-for="SesijaId" class="form-control" asp-items="ViewBag.SesijaId"></select>
-                <span asp-validation-for="SesijaId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TrajanjeUcenja" class="control-label"></label>
-                <input asp-for="TrajanjeUcenja" class="form-control" />
-                <span asp-validation-for="TrajanjeUcenja" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StatusPrisustva" class="control-label"></label>
-                <select asp-for="StatusPrisustva" class="form-control"></select>
-                <span asp-validation-for="StatusPrisustva" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="page-header">
+    <div>
+        <h1>Uređivanje prisustva</h1>
+        <p>Izmijeni podatke o prisustvu korisnika na odabranoj sesiji.</p>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+<div class="form-card">
+    <form asp-action="Edit">
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <input type="hidden" asp-for="IdPrisustva" />
+
+        <div class="form-grid">
+            <div class="form-group">
+                <label asp-for="KorisnikId" class="control-label">Korisnik</label>
+                <select asp-for="KorisnikId" class="form-select" asp-items="ViewBag.KorisnikId">
+                    <option value="">-- Odaberite korisnika --</option>
+                </select>
+                <span asp-validation-for="KorisnikId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SesijaId" class="control-label">Sesija</label>
+                <select asp-for="SesijaId" class="form-select" asp-items="ViewBag.SesijaId">
+                    <option value="">-- Odaberite sesiju --</option>
+                </select>
+                <span asp-validation-for="SesijaId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TrajanjeUcenja" class="control-label">Trajanje učenja u minutama</label>
+                <input asp-for="TrajanjeUcenja" class="form-control" type="number" min="0" placeholder="Npr. 60" />
+                <span asp-validation-for="TrajanjeUcenja" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="StatusPrisustva" class="control-label">Status prisustva</label>
+                <select asp-for="StatusPrisustva" class="form-select" asp-items="Html.GetEnumSelectList<StatusPrisustva>()"></select>
+                <span asp-validation-for="StatusPrisustva" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-sb">Sačuvaj</button>
+            <a asp-action="Index" class="btn btn-outline-sb">Odustani</a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
