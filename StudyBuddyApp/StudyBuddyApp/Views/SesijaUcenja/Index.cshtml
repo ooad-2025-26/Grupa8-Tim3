@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<StudyBuddyApp.Models.SesijaUcenja>
+@using StudyBuddyApp.Models
 
 @{
     ViewData["Title"] = "Sesije učenja";
+    bool samoSlobodnaMjesta = ViewBag.SamoSlobodnaMjesta == true;
 }
 
 <div class="page-header">
@@ -23,11 +25,79 @@
     </div>
 }
 
+<div class="session-filter-card">
+    <form asp-controller="SesijaUcenja" asp-action="Index" method="get">
+        <div class="session-filter-grid">
+            <div class="form-group filter-search">
+                <label class="control-label">Pretraga</label>
+                <input type="text"
+                       name="pretraga"
+                       value="@ViewBag.Pretraga"
+                       class="form-control"
+                       placeholder="Pretraži naziv, opis, predmet ili lokaciju..." />
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Predmet</label>
+                <select name="predmetId" id="predmetId" class="form-select">
+                    <option value="">Svi predmeti</option>
+
+                    @foreach (var predmet in ViewBag.Predmeti)
+                    {
+                        var selected = ViewBag.PredmetId != null && (int)ViewBag.PredmetId == predmet.IdPredmeta;
+
+                        if (selected)
+                        {
+                            <option value="@predmet.IdPredmeta" selected>@predmet.Naziv</option>
+                        }
+                        else
+                        {
+                            <option value="@predmet.IdPredmeta">@predmet.Naziv</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <select name="statusSesije" class="form-select" asp-items="ViewBag.StatusiSesije">
+                    <option value="">Svi statusi</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="control-label">Sortiranje</label>
+                <select name="sortiranje" class="form-select" asp-items="ViewBag.Sortiranja"></select>
+            </div>
+
+            <div class="form-group filter-checkbox">
+                <label class="control-label">Dostupnost</label>
+                <div class="form-check pretty-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           name="samoSlobodnaMjesta"
+                           value="true"
+                           id="samoSlobodnaMjesta"
+                           checked="@samoSlobodnaMjesta" />
+                    <label class="form-check-label" for="samoSlobodnaMjesta">
+                        Samo sesije sa slobodnim mjestima
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn btn-primary-sb">Primijeni filtere</button>
+            <a asp-controller="SesijaUcenja" asp-action="Index" class="btn btn-outline-sb">Poništi sve filtere</a>
+        </div>
+    </form>
+</div>
+
 @if (!Model.Any())
 {
     <div class="empty-state">
-        <h3>Nema dostupnih sesija</h3>
-        <p>Trenutno nema kreiranih sesija učenja.</p>
+        <h3>Nema pronađenih sesija</h3>
+        <p>Trenutno nema sesija koje odgovaraju odabranim filterima.</p>
     </div>
 }
 else

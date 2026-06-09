@@ -30,12 +30,90 @@ namespace StudyBuddyApp.Controllers
             _sesijaSubject = sesijaSubject;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            string? pretraga,
+            [FromQuery] int? predmetId,
+            StatusSesije? statusSesije,
+            bool samoSlobodnaMjesta = false,
+            string? sortiranje = "datum")
         {
             var sesije = _context.SesijeUcenja
                 .Include(s => s.Kreator)
                 .Include(s => s.Lokacija)
-                .Include(s => s.Predmet);
+                .Include(s => s.Predmet)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(pretraga))
+            {
+                var pojam = pretraga.ToLower();
+
+                sesije = sesije.Where(s =>
+                    s.Naziv.ToLower().Contains(pojam) ||
+                    s.Opis.ToLower().Contains(pojam) ||
+                    s.Predmet!.Naziv.ToLower().Contains(pojam) ||
+                    s.Lokacija!.Naziv.ToLower().Contains(pojam));
+            }
+
+            if (predmetId.HasValue)
+            {
+                sesije = sesije.Where(s => s.PredmetId == predmetId.Value);
+            }
+
+            if (statusSesije.HasValue)
+            {
+                sesije = sesije.Where(s => s.StatusSesije == statusSesije.Value);
+            }
+
+            if (samoSlobodnaMjesta)
+            {
+                sesije = sesije.Where(s => s.BrojSlobodnihMjesta > 0);
+            }
+
+            sesije = sortiranje switch
+            {
+                "datum_desc" => sesije.OrderByDescending(s => s.DatumVrijeme),
+                "mjesta" => sesije.OrderBy(s => s.BrojSlobodnihMjesta),
+                "mjesta_desc" => sesije.OrderByDescending(s => s.BrojSlobodnihMjesta),
+                "naziv" => sesije.OrderBy(s => s.Naziv),
+                _ => sesije.OrderBy(s => s.DatumVrijeme)
+            };
+
+            ViewBag.Pretraga = pretraga;
+            ViewBag.PredmetId = predmetId;
+            ViewBag.StatusSesijeOdabrano = statusSesije;
+            ViewBag.SamoSlobodnaMjesta = samoSlobodnaMjesta;
+            ViewBag.Sortiranje = sortiranje;
+
+            ViewBag.Predmeti = await _context.Predmeti
+                .OrderBy(p => p.Naziv)
+                .ToListAsync();
+
+            ViewBag.StatusiSesije = new SelectList(
+                Enum.GetValues(typeof(StatusSesije))
+                    .Cast<StatusSesije>()
+                    .Select(s => new
+                    {
+                        Value = s.ToString(),
+                        Text = s.ToString()
+                    }),
+                "Value",
+                "Text",
+                statusSesije?.ToString()
+            );
+
+            ViewBag.Sortiranja = new SelectList(
+                new[]
+                {
+            new { Value = "datum", Text = "Datum: prvo najranije" },
+            new { Value = "datum_desc", Text = "Datum: prvo najkasnije" },
+            new { Value = "mjesta_desc", Text = "Slobodna mjesta: najviše prvo" },
+            new { Value = "mjesta", Text = "Slobodna mjesta: najmanje prvo" },
+            new { Value = "naziv", Text = "Naziv sesije" }
+                },
+                "Value",
+                "Text",
+                sortiranje
+            );
 
             return View(await sesije.ToListAsync());
         }
