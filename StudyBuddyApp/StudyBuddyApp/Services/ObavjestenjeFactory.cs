@@ -15,7 +15,7 @@ namespace StudyBuddyApp.Services
                 {
                     Naslov = "Prijava na sesiju",
                     Sadrzaj = $"Uspješno ste prijavljeni na sesiju: {sesija.Naziv}.",
-                    DatumSlanja = DateTime.Now,
+                    DatumSlanja = DateTime.UtcNow,
                     KorisnikId = korisnik.Id,
                     TipObavjestenja = TipObavjestenja.Prijava,
                     Procitano = false
@@ -25,7 +25,7 @@ namespace StudyBuddyApp.Services
                 {
                     Naslov = "Otkazivanje prijave",
                     Sadrzaj = $"Vaša prijava na sesiju {sesija.Naziv} je otkazana.",
-                    DatumSlanja = DateTime.Now,
+                    DatumSlanja = DateTime.UtcNow,
                     KorisnikId = korisnik.Id,
                     TipObavjestenja = TipObavjestenja.Otkazivanje,
                     Procitano = false
@@ -35,7 +35,7 @@ namespace StudyBuddyApp.Services
                 {
                     Naslov = "Podsjetnik za sesiju",
                     Sadrzaj = $"Podsjetnik: sesija {sesija.Naziv} počinje {sesija.DatumVrijeme}.",
-                    DatumSlanja = DateTime.Now,
+                    DatumSlanja = DateTime.UtcNow,
                     KorisnikId = korisnik.Id,
                     TipObavjestenja = TipObavjestenja.Podsjetnik,
                     Procitano = false
@@ -45,7 +45,7 @@ namespace StudyBuddyApp.Services
                 {
                     Naslov = "Promjena termina sesije",
                     Sadrzaj = $"Termin sesije {sesija.Naziv} je promijenjen.",
-                    DatumSlanja = DateTime.Now,
+                    DatumSlanja = DateTime.UtcNow,
                     KorisnikId = korisnik.Id,
                     TipObavjestenja = TipObavjestenja.PromjenaTermina,
                     Procitano = false
@@ -55,7 +55,7 @@ namespace StudyBuddyApp.Services
                 {
                     Naslov = "Obavještenje",
                     Sadrzaj = $"Novo obavještenje za sesiju: {sesija.Naziv}.",
-                    DatumSlanja = DateTime.Now,
+                    DatumSlanja = DateTime.UtcNow,
                     KorisnikId = korisnik.Id,
                     TipObavjestenja = tip,
                     Procitano = false

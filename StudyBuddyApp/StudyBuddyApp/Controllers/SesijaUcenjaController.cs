@@ -86,7 +86,7 @@ namespace StudyBuddyApp.Controllers
         [Authorize(Roles = "Administrator,Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,MaksimalanBrojUcesnika,BrojSlobodnihMjesta,StatusSesije")] SesijaUcenja sesijaUcenja)
+        public async Task<IActionResult> Create([Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,MaksimalanBrojUcesnika,StatusSesije")] SesijaUcenja sesijaUcenja)
         {
             var korisnik = await _userManager.GetUserAsync(User);
 
@@ -96,20 +96,16 @@ namespace StudyBuddyApp.Controllers
             }
 
             sesijaUcenja.KreatorId = korisnik.Id;
+            sesijaUcenja.BrojSlobodnihMjesta = sesijaUcenja.MaksimalanBrojUcesnika;
+            sesijaUcenja.DatumVrijeme = DateTime.SpecifyKind(sesijaUcenja.DatumVrijeme, DateTimeKind.Utc);
+
+            ModelState.Remove("KreatorId");
+            ModelState.Remove("Kreator");
+            ModelState.Remove("BrojSlobodnihMjesta");
 
             if (sesijaUcenja.MaksimalanBrojUcesnika <= 0)
             {
                 ModelState.AddModelError("MaksimalanBrojUcesnika", "Maksimalan broj učesnika mora biti veći od 0.");
-            }
-
-            if (sesijaUcenja.BrojSlobodnihMjesta < 0)
-            {
-                ModelState.AddModelError("BrojSlobodnihMjesta", "Broj slobodnih mjesta ne može biti negativan.");
-            }
-
-            if (sesijaUcenja.BrojSlobodnihMjesta > sesijaUcenja.MaksimalanBrojUcesnika)
-            {
-                ModelState.AddModelError("BrojSlobodnihMjesta", "Broj slobodnih mjesta ne može biti veći od maksimalnog broja učesnika.");
             }
 
             if (sesijaUcenja.Trajanje <= 0)
@@ -161,9 +157,26 @@ namespace StudyBuddyApp.Controllers
                 return NotFound();
             }
 
+            sesijaUcenja.DatumVrijeme = DateTime.SpecifyKind(sesijaUcenja.DatumVrijeme, DateTimeKind.Utc);
+
+            if (sesijaUcenja.MaksimalanBrojUcesnika <= 0)
+            {
+                ModelState.AddModelError("MaksimalanBrojUcesnika", "Maksimalan broj učesnika mora biti veći od 0.");
+            }
+
+            if (sesijaUcenja.BrojSlobodnihMjesta < 0)
+            {
+                ModelState.AddModelError("BrojSlobodnihMjesta", "Broj slobodnih mjesta ne može biti negativan.");
+            }
+
             if (sesijaUcenja.BrojSlobodnihMjesta > sesijaUcenja.MaksimalanBrojUcesnika)
             {
                 ModelState.AddModelError("BrojSlobodnihMjesta", "Broj slobodnih mjesta ne može biti veći od maksimalnog broja učesnika.");
+            }
+
+            if (sesijaUcenja.Trajanje <= 0)
+            {
+                ModelState.AddModelError("Trajanje", "Trajanje sesije mora biti veće od 0.");
             }
 
             if (ModelState.IsValid)
@@ -276,7 +289,7 @@ namespace StudyBuddyApp.Controllers
 
             var prijava = new PrijavaNaSesiju
             {
-                DatumPrijave = DateTime.Now,
+                DatumPrijave = DateTime.UtcNow,
                 KorisnikId = korisnik.Id,
                 SesijaId = sesija.IdSesije,
                 StatusPrijave = StatusPrijave.Prijavljen

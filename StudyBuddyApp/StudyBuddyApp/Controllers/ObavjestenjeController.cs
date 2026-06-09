@@ -91,7 +91,7 @@ namespace StudyBuddyApp.Controllers
         {
             if (obavjestenje.DatumSlanja == default)
             {
-                obavjestenje.DatumSlanja = DateTime.Now;
+                obavjestenje.DatumSlanja = DateTime.UtcNow;
             }
 
             if (ModelState.IsValid)
