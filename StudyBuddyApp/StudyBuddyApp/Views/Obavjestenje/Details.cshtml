@@ -1,54 +1,99 @@
 ﻿@model StudyBuddyApp.Models.Obavjestenje
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalji obavještenja";
+
+    var datum = Model.DatumSlanja.ToLocalTime().ToString("dd.MM.yyyy. HH:mm");
+    var korisnikNaziv = Model.Korisnik != null
+        ? $"{Model.Korisnik.Ime} {Model.Korisnik.Prezime} ({Model.Korisnik.Email})"
+        : "Nepoznat korisnik";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Obavjestenje</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Naslov)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Naslov)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Sadrzaj)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Sadrzaj)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DatumSlanja)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DatumSlanja)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Korisnik)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Korisnik.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.TipObavjestenja)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.TipObavjestenja)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Procitano)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Procitano)
-        </dd>
-    </dl>
+<div class="page-header">
+    <div>
+        <h1>Detalji obavještenja</h1>
+        <p>Pregled sadržaja i statusa odabranog obavještenja.</p>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.IdObavjestenja">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="details-card notification-details-card">
+    <div class="details-top">
+        <div>
+            <span class="notification-type">@Model.TipObavjestenja</span>
+            <h2>@Model.Naslov</h2>
+        </div>
+
+        @if (Model.Procitano)
+        {
+            <span class="notification-status">Pročitano</span>
+        }
+        else
+        {
+            <span class="notification-status">Nepročitano</span>
+        }
+    </div>
+
+    <div class="details-description">
+        <h3>Sadržaj</h3>
+        <p>@Model.Sadrzaj</p>
+    </div>
+
+    <div class="details-info">
+        <div>
+            <span>Datum slanja</span>
+            <strong>@datum</strong>
+        </div>
+
+        <div>
+            <span>Korisnik</span>
+            <strong>@korisnikNaziv</strong>
+        </div>
+    </div>
+
+    <div class="details-actions">
+        @if (!Model.Procitano)
+        {
+            <form asp-action="OznaciKaoProcitano" asp-route-id="@Model.IdObavjestenja" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary-sb">Označi kao pročitano</button>
+            </form>
+        }
+
+        @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.IdObavjestenja" class="btn btn-secondary">
+                Uredi
+            </a>
+        }
+
+        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteNotificationModal">
+            Obriši obavještenje
+        </button>
+
+        <a asp-action="Index" class="btn btn-outline-sb">Nazad na obavještenja</a>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteNotificationModal" tabindex="-1" aria-labelledby="deleteNotificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content sb-modal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteNotificationModalLabel">Brisanje obavještenja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Zatvori"></button>
+            </div>
+
+            <div class="modal-body">
+                Da li ste sigurni da želite obrisati ovo obavještenje?
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-sb" data-bs-dismiss="modal">Odustani</button>
+
+                <form asp-action="DeleteFromDetails" asp-route-id="@Model.IdObavjestenja" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Obriši</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

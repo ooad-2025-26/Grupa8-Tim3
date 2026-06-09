@@ -4,6 +4,7 @@ using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
 using StudyBuddyApp.Services;
 using StudyBuddyApp.Services.Notifications;
+using StudyBuddyApp.Services.Observers;
 using StudyBuddyApp.Services.Sessions;
 using StudyBuddyApp.Services.Statistics;
 
@@ -33,6 +34,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ObavjestenjeFactory>();
 builder.Services.AddScoped<EksterniEmailServis>();
 builder.Services.AddScoped<IObavjestenjeSender, EmailSenderAdapter>();
+builder.Services.AddScoped<ISesijaObserver, SesijaObavjestenjeObserver>();
+builder.Services.AddScoped<SesijaSubject>();
 builder.Services.AddScoped<SesijaFacade>();
 builder.Services.AddScoped<IStatistikaStrategy, BrojSesijaStrategy>();
 builder.Services.AddScoped<IStatistikaStrategy, BrojPrisustavaStrategy>();

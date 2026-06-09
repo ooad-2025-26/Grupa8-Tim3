@@ -186,11 +186,15 @@ namespace StudyBuddyApp.Controllers
         {
             var obavjestenje = await _context.Obavjestenja.FindAsync(id);
 
-            if (obavjestenje != null)
+            if (obavjestenje == null)
             {
-                _context.Obavjestenja.Remove(obavjestenje);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            _context.Obavjestenja.Remove(obavjestenje);
+            await _context.SaveChangesAsync();
+
+            TempData["Poruka"] = "Obavještenje je uspješno obrisano.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -222,6 +226,40 @@ namespace StudyBuddyApp.Controllers
 
             obavjestenje.Procitano = true;
             await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteFromDetails(int id)
+        {
+            var korisnik = await _userManager.GetUserAsync(User);
+
+            if (korisnik == null)
+            {
+                return Challenge();
+            }
+
+            var obavjestenje = await _context.Obavjestenja
+                .FirstOrDefaultAsync(o => o.IdObavjestenja == id);
+
+            if (obavjestenje == null)
+            {
+                return NotFound();
+            }
+
+            if (!User.IsInRole("Administrator") &&
+                !User.IsInRole("Moderator") &&
+                obavjestenje.KorisnikId != korisnik.Id)
+            {
+                return Forbid();
+            }
+
+            _context.Obavjestenja.Remove(obavjestenje);
+            await _context.SaveChangesAsync();
+
+            TempData["Poruka"] = "Obavještenje je uspješno obrisano.";
 
             return RedirectToAction(nameof(Index));
         }

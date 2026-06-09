@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
+using StudyBuddyApp.Services.Observers;
 using StudyBuddyApp.Services.Sessions;
 
 namespace StudyBuddyApp.Controllers
@@ -15,15 +16,18 @@ namespace StudyBuddyApp.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Korisnik> _userManager;
         private readonly SesijaFacade _sesijaFacade;
+        private readonly SesijaSubject _sesijaSubject;
 
         public SesijaUcenjaController(
             ApplicationDbContext context,
             UserManager<Korisnik> userManager,
-            SesijaFacade sesijaFacade)
+            SesijaFacade sesijaFacade,
+            SesijaSubject sesijaSubject)
         {
             _context = context;
             _userManager = userManager;
             _sesijaFacade = sesijaFacade;
+            _sesijaSubject = sesijaSubject;
         }
 
         public async Task<IActionResult> Index()
@@ -142,34 +146,38 @@ namespace StudyBuddyApp.Controllers
                 return NotFound();
             }
 
-            sesijaUcenja.DatumVrijeme = DateTime.SpecifyKind(sesijaUcenja.DatumVrijeme, DateTimeKind.Utc);
-
-            if (sesijaUcenja.MaksimalanBrojUcesnika <= 0)
-            {
-                ModelState.AddModelError("MaksimalanBrojUcesnika", "Maksimalan broj učesnika mora biti veći od 0.");
-            }
-
-            if (sesijaUcenja.BrojSlobodnihMjesta < 0)
-            {
-                ModelState.AddModelError("BrojSlobodnihMjesta", "Broj slobodnih mjesta ne može biti negativan.");
-            }
-
-            if (sesijaUcenja.BrojSlobodnihMjesta > sesijaUcenja.MaksimalanBrojUcesnika)
-            {
-                ModelState.AddModelError("BrojSlobodnihMjesta", "Broj slobodnih mjesta ne može biti veći od maksimalnog broja učesnika.");
-            }
-
-            if (sesijaUcenja.Trajanje <= 0)
-            {
-                ModelState.AddModelError("Trajanje", "Trajanje sesije mora biti veće od 0.");
-            }
-
             if (ModelState.IsValid)
             {
+                var staraSesija = await _context.SesijeUcenja
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(s => s.IdSesije == id);
+
+                if (staraSesija == null)
+                {
+                    return NotFound();
+                }
+
+                var promjena = new SesijaPromjenaInfo
+                {
+                    SesijaId = id,
+                    StariDatumVrijeme = staraSesija.DatumVrijeme,
+                    NoviDatumVrijeme = DateTime.SpecifyKind(sesijaUcenja.DatumVrijeme, DateTimeKind.Utc),
+                    StaraLokacijaId = staraSesija.LokacijaId,
+                    NovaLokacijaId = sesijaUcenja.LokacijaId,
+                    StariStatus = staraSesija.StatusSesije,
+                    NoviStatus = sesijaUcenja.StatusSesije
+                };
+
+                sesijaUcenja.DatumVrijeme = DateTime.SpecifyKind(sesijaUcenja.DatumVrijeme, DateTimeKind.Utc);
+
                 try
                 {
                     _context.Update(sesijaUcenja);
                     await _context.SaveChangesAsync();
+
+                    await _sesijaSubject.ObavijestiObservereAsync(promjena);
+
+                    TempData["Poruka"] = "Sesija je uspješno uređena.";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -184,8 +192,9 @@ namespace StudyBuddyApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            PopuniPadajuceListe(sesijaUcenja.LokacijaId, sesijaUcenja.PredmetId);
             ViewData["KreatorId"] = new SelectList(_context.Users, "Id", "Ime", sesijaUcenja.KreatorId);
+            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv", sesijaUcenja.LokacijaId);
+            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv", sesijaUcenja.PredmetId);
 
             return View(sesijaUcenja);
         }

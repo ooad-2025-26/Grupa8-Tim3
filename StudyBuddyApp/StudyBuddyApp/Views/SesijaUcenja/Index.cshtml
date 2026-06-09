@@ -78,11 +78,11 @@ else
                     @if (User.IsInRole("Administrator"))
                     {
                         <a asp-action="Edit" asp-route-id="@item.IdSesije" class="btn btn-secondary">
-                            Edit
+                            Uredi
                         </a>
 
                         <a asp-action="Delete" asp-route-id="@item.IdSesije" class="btn btn-danger">
-                            Delete
+                            Obriši
                         </a>
                     }
                 </div>

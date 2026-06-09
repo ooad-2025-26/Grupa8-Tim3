@@ -145,3 +145,27 @@
     .pretty-check .form-check-input {
         margin-right: 0.45rem;
     }
+
+.sb-modal {
+    border: 1px solid var(--sb-border);
+    border-radius: 24px;
+    box-shadow: 0 22px 46px rgba(214, 51, 132, 0.16);
+}
+
+    .sb-modal .modal-header {
+        border-bottom: 1px solid var(--sb-border);
+    }
+
+    .sb-modal .modal-title {
+        color: var(--sb-primary-dark);
+        font-weight: 900;
+    }
+
+    .sb-modal .modal-body {
+        color: var(--sb-text);
+        font-size: 1rem;
+    }
+
+    .sb-modal .modal-footer {
+        border-top: 1px solid var(--sb-border);
+    }
