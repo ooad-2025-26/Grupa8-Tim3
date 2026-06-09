@@ -65,6 +65,11 @@ else
                     <h2>Prisustvo</h2>
                     <p>Pregledaj evidentirano prisustvo na sesijama učenja.</p>
                 </a>
+                <a asp-controller="Statistika" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📊</span>
+                    <h2>Statistika</h2>
+                    <p>Pregledaj broj sesija, prisustva i ukupno vrijeme učenja.</p>
+                </a>
             </div>
         }
         else if (User.IsInRole("Moderator"))
@@ -102,6 +107,12 @@ else
                     <span class="dashboard-icon">👥</span>
                     <h2>Korisnici</h2>
                     <p>Upravljaj korisnicima i njihovim nalozima.</p>
+                </a>
+
+                <a asp-controller="Statistika" asp-action="Index" class="dashboard-card">
+                    <span class="dashboard-icon">📊</span>
+                    <h2>Statistika</h2>
+                    <p>Pregledaj aktivnost korisnika kroz sesije, prisustvo i vrijeme učenja.</p>
                 </a>
 
                 <a asp-controller="Predmet" asp-action="Index" class="dashboard-card">

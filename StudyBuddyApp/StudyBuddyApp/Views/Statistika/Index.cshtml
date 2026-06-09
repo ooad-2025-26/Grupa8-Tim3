@@ -1,0 +1,69 @@
+﻿@model IEnumerable<StudyBuddyApp.Services.Statistics.StatistikaRezultat>
+@using StudyBuddyApp.Models
+
+@{
+    ViewData["Title"] = "Statistika";
+    var prikazaniKorisnik = ViewBag.PrikazaniKorisnik as Korisnik;
+}
+
+<div class="page-header">
+    <div>
+        <h1>Statistika učenja</h1>
+
+        @if (prikazaniKorisnik != null)
+        {
+            <p>
+                Pregled osnovnih pokazatelja aktivnosti za korisnika:
+                <strong>@prikazaniKorisnik.Ime @prikazaniKorisnik.Prezime</strong>
+            </p>
+        }
+        else
+        {
+            <p>Pregled osnovnih pokazatelja aktivnosti korisnika u sistemu.</p>
+        }
+    </div>
+</div>
+
+@if (TempData["Greska"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Greska"]
+    </div>
+}
+
+@if (User.IsInRole("Administrator"))
+{
+    <div class="form-card statistics-filter-card">
+        <form asp-action="Index" method="get">
+            <div class="form-grid">
+                <div class="form-group form-full">
+                    <label class="control-label">Odaberi korisnika</label>
+                    <select name="korisnikId" class="form-select" asp-items="ViewBag.Korisnici" onchange="this.form.submit()">
+                        <option value="">-- Odaberite korisnika --</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+
+@if (!Model.Any())
+{
+    <div class="empty-state">
+        <h3>Nema statistike</h3>
+        <p>Trenutno nema dovoljno podataka za prikaz statistike.</p>
+    </div>
+}
+else
+{
+    <div class="stats-grid">
+        @foreach (var item in Model)
+        {
+            <div class="stats-card">
+                <span class="stats-label">@item.Naziv</span>
+                <strong>@item.Vrijednost</strong>
+                <p>@item.Opis</p>
+            </div>
+        }
+    </div>
+}
