@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
-using StudyBuddyApp.Services;
+using StudyBuddyApp.Services.Sessions;
 
 namespace StudyBuddyApp.Controllers
 {
@@ -14,16 +14,16 @@ namespace StudyBuddyApp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<Korisnik> _userManager;
-        private readonly ObavjestenjeFactory _obavjestenjeFactory;
+        private readonly SesijaFacade _sesijaFacade;
 
         public SesijaUcenjaController(
             ApplicationDbContext context,
             UserManager<Korisnik> userManager,
-            ObavjestenjeFactory obavjestenjeFactory)
+            SesijaFacade sesijaFacade)
         {
             _context = context;
             _userManager = userManager;
-            _obavjestenjeFactory = obavjestenjeFactory;
+            _sesijaFacade = sesijaFacade;
         }
 
         public async Task<IActionResult> Index()
@@ -95,34 +95,19 @@ namespace StudyBuddyApp.Controllers
                 return Challenge();
             }
 
-            sesijaUcenja.KreatorId = korisnik.Id;
-            sesijaUcenja.BrojSlobodnihMjesta = sesijaUcenja.MaksimalanBrojUcesnika;
-            sesijaUcenja.DatumVrijeme = DateTime.SpecifyKind(sesijaUcenja.DatumVrijeme, DateTimeKind.Utc);
+            var rezultat = await _sesijaFacade.KreirajSesijuAsync(sesijaUcenja, korisnik);
 
-            ModelState.Remove("KreatorId");
-            ModelState.Remove("Kreator");
-            ModelState.Remove("BrojSlobodnihMjesta");
-
-            if (sesijaUcenja.MaksimalanBrojUcesnika <= 0)
+            if (rezultat.Uspjesno)
             {
-                ModelState.AddModelError("MaksimalanBrojUcesnika", "Maksimalan broj učesnika mora biti veći od 0.");
-            }
-
-            if (sesijaUcenja.Trajanje <= 0)
-            {
-                ModelState.AddModelError("Trajanje", "Trajanje sesije mora biti veće od 0.");
-            }
-
-            if (ModelState.IsValid)
-            {
-                _context.SesijeUcenja.Add(sesijaUcenja);
-                await _context.SaveChangesAsync();
-
-                TempData["Poruka"] = "Sesija je uspješno kreirana.";
+                TempData["Poruka"] = rezultat.Poruka;
                 return RedirectToAction(nameof(Index));
             }
 
-            PopuniPadajuceListe(sesijaUcenja.LokacijaId, sesijaUcenja.PredmetId);
+            ModelState.AddModelError(string.Empty, rezultat.Poruka ?? "Došlo je do greške prilikom kreiranja sesije.");
+
+            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv", sesijaUcenja.LokacijaId);
+            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv", sesijaUcenja.PredmetId);
+
             return View(sesijaUcenja);
         }
 
@@ -255,58 +240,17 @@ namespace StudyBuddyApp.Controllers
                 return Challenge();
             }
 
-            var sesija = await _context.SesijeUcenja
-                .FirstOrDefaultAsync(s => s.IdSesije == id);
+            var rezultat = await _sesijaFacade.PrijaviKorisnikaNaSesijuAsync(id, korisnik);
 
-            if (sesija == null)
+            if (rezultat.Uspjesno)
             {
-                return NotFound();
+                TempData["Poruka"] = rezultat.Poruka;
+            }
+            else
+            {
+                TempData["Greska"] = rezultat.Poruka;
             }
 
-            if (sesija.StatusSesije != StatusSesije.Aktivna)
-            {
-                TempData["Greska"] = "Prijava nije moguća jer sesija nije aktivna.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            if (sesija.BrojSlobodnihMjesta <= 0)
-            {
-                TempData["Greska"] = "Prijava nije moguća jer nema slobodnih mjesta.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            var vecPrijavljen = await _context.PrijaveNaSesije
-                .AnyAsync(p =>
-                    p.SesijaId == id &&
-                    p.KorisnikId == korisnik.Id &&
-                    p.StatusPrijave == StatusPrijave.Prijavljen);
-
-            if (vecPrijavljen)
-            {
-                TempData["Greska"] = "Već ste prijavljeni na ovu sesiju.";
-                return RedirectToAction(nameof(Details), new { id });
-            }
-
-            var prijava = new PrijavaNaSesiju
-            {
-                DatumPrijave = DateTime.UtcNow,
-                KorisnikId = korisnik.Id,
-                SesijaId = sesija.IdSesije,
-                StatusPrijave = StatusPrijave.Prijavljen
-            };
-
-            sesija.BrojSlobodnihMjesta--;
-
-            var obavjestenje = _obavjestenjeFactory.KreirajObavjestenje(
-                TipObavjestenja.Prijava,
-                korisnik,
-                sesija);
-
-            _context.PrijaveNaSesije.Add(prijava);
-            _context.Obavjestenja.Add(obavjestenje);
-            await _context.SaveChangesAsync();
-
-            TempData["Poruka"] = "Uspješno ste se prijavili na sesiju.";
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -322,37 +266,23 @@ namespace StudyBuddyApp.Controllers
                 return Challenge();
             }
 
-            var prijava = await _context.PrijaveNaSesije
-                .Include(p => p.SesijaUcenja)
-                .FirstOrDefaultAsync(p =>
-                    p.IdPrijave == id &&
-                    p.KorisnikId == korisnik.Id &&
-                    p.StatusPrijave == StatusPrijave.Prijavljen);
+            var (rezultat, sesijaId) = await _sesijaFacade.OtkaziPrijavuAsync(id, korisnik);
 
-            if (prijava == null)
+            if (rezultat.Uspjesno)
             {
-                TempData["Greska"] = "Aktivna prijava nije pronađena.";
-                return RedirectToAction(nameof(Index));
+                TempData["Poruka"] = rezultat.Poruka;
+            }
+            else
+            {
+                TempData["Greska"] = rezultat.Poruka;
             }
 
-            if (prijava.SesijaUcenja == null)
+            if (sesijaId.HasValue)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Details), new { id = sesijaId.Value });
             }
 
-            prijava.StatusPrijave = StatusPrijave.Otkazan;
-            prijava.SesijaUcenja.BrojSlobodnihMjesta++;
-
-            var obavjestenje = _obavjestenjeFactory.KreirajObavjestenje(
-                TipObavjestenja.Otkazivanje,
-                korisnik,
-                prijava.SesijaUcenja);
-
-            _context.Obavjestenja.Add(obavjestenje);
-            await _context.SaveChangesAsync();
-
-            TempData["Poruka"] = "Uspješno ste otkazali prijavu.";
-            return RedirectToAction(nameof(Details), new { id = prijava.SesijaId });
+            return RedirectToAction(nameof(Index));
         }
 
         private void PopuniPadajuceListe(int? lokacijaId = null, int? predmetId = null)

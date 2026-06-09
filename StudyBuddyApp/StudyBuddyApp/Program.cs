@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Models;
 using StudyBuddyApp.Services;
+using StudyBuddyApp.Services.Notifications;
+using StudyBuddyApp.Services.Sessions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +30,9 @@ builder.Services.AddDefaultIdentity<Korisnik>(options =>
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<ObavjestenjeFactory>();
+builder.Services.AddScoped<EksterniEmailServis>();
+builder.Services.AddScoped<IObavjestenjeSender, EmailSenderAdapter>();
+builder.Services.AddScoped<SesijaFacade>();
 
 var app = builder.Build();
 
