@@ -56,10 +56,38 @@ namespace StudyBuddyApp.Services.Sessions
                 return SessionOperationResult.Greska("Odabrana lokacija ne postoji.");
             }
 
+            var pocetakNoveSesije = DateTime.SpecifyKind(podaci.DatumVrijeme, DateTimeKind.Utc);
+            var krajNoveSesije = pocetakNoveSesije.AddMinutes(podaci.Trajanje);
+
+            var postojeceSesijeNaLokaciji = await _context.SesijeUcenja
+                .Where(s =>
+                    s.LokacijaId == podaci.LokacijaId &&
+                    s.StatusSesije == StatusSesije.Aktivna)
+                .Select(s => new
+                {
+                    s.DatumVrijeme,
+                    s.Trajanje
+                })
+                .ToListAsync();
+
+            bool lokacijaZauzeta = postojeceSesijeNaLokaciji.Any(s =>
+            {
+                var pocetakPostojece = s.DatumVrijeme;
+                var krajPostojece = s.DatumVrijeme.AddMinutes(s.Trajanje);
+
+                return pocetakNoveSesije < krajPostojece &&
+                       krajNoveSesije > pocetakPostojece;
+            });
+
+            if (lokacijaZauzeta)
+            {
+                return SessionOperationResult.Greska("Odabrana lokacija je već zauzeta u tom terminu. Odaberite drugu lokaciju ili promijenite vrijeme.");
+            }
+
             var sesija = new SesijaUcenjaBuilder()
                 .PostaviNaziv(podaci.Naziv)
                 .PostaviOpis(podaci.Opis)
-                .PostaviDatumVrijeme(podaci.DatumVrijeme)
+                .PostaviDatumVrijeme(pocetakNoveSesije)
                 .PostaviTrajanje(podaci.Trajanje)
                 .PostaviPredmet(podaci.PredmetId)
                 .PostaviLokaciju(podaci.LokacijaId)

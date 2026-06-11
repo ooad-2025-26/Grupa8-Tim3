@@ -77,6 +77,7 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 
     await PredmetSeeder.SeedAsync(db);
+    await LokacijaSeeder.SeedAsync(db);
 }
 
 app.Run();

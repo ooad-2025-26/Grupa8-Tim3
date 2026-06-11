@@ -73,10 +73,41 @@
 
             <div class="form-group">
                 <label asp-for="LokacijaId" class="control-label">Lokacija</label>
-                <select asp-for="LokacijaId" class="form-select" asp-items="ViewBag.LokacijaId">
+                <select asp-for="LokacijaId" class="form-select" asp-items="ViewBag.LokacijaId" id="lokacijaSelect">
                     <option value="">-- Odaberite lokaciju --</option>
+                    <option value="-1">Dodaj novu lokaciju</option>
                 </select>
                 <span asp-validation-for="LokacijaId" class="text-danger"></span>
+            </div>
+
+            <div id="novaLokacijaPolja" class="form-group form-full" style="display: none;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="control-label">Naziv nove lokacije</label>
+                        <input name="NovaLokacijaNaziv" class="form-control" placeholder="Npr. Moja čitaonica" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Tip lokacije</label>
+                        <select name="NovaLokacijaTip" class="form-select" id="novaLokacijaTip">
+                            <option value="">Odaberi tip lokacije</option>
+                            @foreach (TipLokacije tip in Enum.GetValues(typeof(TipLokacije)))
+                            {
+                                <option value="@tip">@tip</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="novaAdresaPolje">
+                        <label class="control-label">Adresa</label>
+                        <input name="NovaLokacijaAdresa" class="form-control" placeholder="Npr. Zmaja od Bosne bb, Sarajevo" />
+                    </div>
+
+                    <div class="form-group" id="novaLinkPolje">
+                        <label class="control-label">Link</label>
+                        <input name="NovaLokacijaLink" class="form-control" placeholder="Npr. https://meet.google.com/new" />
+                    </div>
+                </div>
             </div>
 
             <div class="form-group">
@@ -140,5 +171,40 @@
 
         godinaSelect.addEventListener("change", ucitajPredmete);
         smjerSelect.addEventListener("change", ucitajPredmete);
+
+        const lokacijaSelect = document.getElementById("lokacijaSelect");
+        const novaLokacijaPolja = document.getElementById("novaLokacijaPolja");
+        const novaLokacijaTip = document.getElementById("novaLokacijaTip");
+        const novaAdresaPolje = document.getElementById("novaAdresaPolje");
+        const novaLinkPolje = document.getElementById("novaLinkPolje");
+
+        function prikaziPoljaZaNovuLokaciju() {
+            if (lokacijaSelect.value === "-1") {
+                novaLokacijaPolja.style.display = "block";
+            } else {
+                novaLokacijaPolja.style.display = "none";
+            }
+        }
+
+        function prilagodiPoljaPoTipuLokacije() {
+            const tip = novaLokacijaTip.value;
+
+            if (tip === "Online") {
+                novaAdresaPolje.style.display = "none";
+                novaLinkPolje.style.display = "block";
+            } else if (tip === "Fizicka") {
+                novaAdresaPolje.style.display = "block";
+                novaLinkPolje.style.display = "none";
+            } else {
+                novaAdresaPolje.style.display = "block";
+                novaLinkPolje.style.display = "block";
+            }
+        }
+
+        lokacijaSelect.addEventListener("change", prikaziPoljaZaNovuLokaciju);
+        novaLokacijaTip.addEventListener("change", prilagodiPoljaPoTipuLokacije);
+
+        prikaziPoljaZaNovuLokaciju();
+        prilagodiPoljaPoTipuLokacije();
     </script>
 }

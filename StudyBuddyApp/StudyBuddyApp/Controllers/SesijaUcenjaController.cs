@@ -221,13 +221,75 @@ namespace StudyBuddyApp.Controllers
         [Authorize(Roles = "Administrator,Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,MaksimalanBrojUcesnika,StatusSesije")] SesijaUcenja sesijaUcenja)
+        public async Task<IActionResult> Create(
+    [Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,MaksimalanBrojUcesnika,StatusSesije")] SesijaUcenja sesijaUcenja,
+    string? NovaLokacijaNaziv,
+    TipLokacije? NovaLokacijaTip,
+    string? NovaLokacijaAdresa,
+    string? NovaLokacijaLink)
         {
             var korisnik = await _userManager.GetUserAsync(User);
 
             if (korisnik == null)
             {
                 return Challenge();
+            }
+
+            if (sesijaUcenja.LokacijaId == -1)
+            {
+                if (string.IsNullOrWhiteSpace(NovaLokacijaNaziv))
+                {
+                    ModelState.AddModelError(string.Empty, "Naziv nove lokacije je obavezan.");
+                    PopuniPadajuceListe(sesijaUcenja.LokacijaId, sesijaUcenja.PredmetId);
+                    return View(sesijaUcenja);
+                }
+
+                if (!NovaLokacijaTip.HasValue)
+                {
+                    ModelState.AddModelError(string.Empty, "Tip nove lokacije je obavezan.");
+                    PopuniPadajuceListe(sesijaUcenja.LokacijaId, sesijaUcenja.PredmetId);
+                    return View(sesijaUcenja);
+                }
+
+                if (NovaLokacijaTip.Value == TipLokacije.Fizicka && string.IsNullOrWhiteSpace(NovaLokacijaAdresa))
+                {
+                    ModelState.AddModelError(string.Empty, "Adresa je obavezna za fizičku lokaciju.");
+                    PopuniPadajuceListe(sesijaUcenja.LokacijaId, sesijaUcenja.PredmetId);
+                    return View(sesijaUcenja);
+                }
+
+                if (NovaLokacijaTip.Value == TipLokacije.Online && string.IsNullOrWhiteSpace(NovaLokacijaLink))
+                {
+                    NovaLokacijaLink = "https://meet.google.com/new";
+                }
+
+                var postojecaLokacija = await _context.Lokacije.FirstOrDefaultAsync(l =>
+                    l.Naziv == NovaLokacijaNaziv.Trim() &&
+                    l.TipLokacije == NovaLokacijaTip.Value);
+
+                if (postojecaLokacija != null)
+                {
+                    sesijaUcenja.LokacijaId = postojecaLokacija.IdLokacije;
+                }
+                else
+                {
+                    var novaLokacija = new Lokacija
+                    {
+                        Naziv = NovaLokacijaNaziv.Trim(),
+                        TipLokacije = NovaLokacijaTip.Value,
+                        Adresa = NovaLokacijaTip.Value == TipLokacije.Fizicka
+                            ? NovaLokacijaAdresa?.Trim() ?? string.Empty
+                            : string.Empty,
+                        Link = NovaLokacijaTip.Value == TipLokacije.Online
+                            ? NovaLokacijaLink?.Trim() ?? "https://meet.google.com/new"
+                            : string.Empty
+                    };
+
+                    _context.Lokacije.Add(novaLokacija);
+                    await _context.SaveChangesAsync();
+
+                    sesijaUcenja.LokacijaId = novaLokacija.IdLokacije;
+                }
             }
 
             var rezultat = await _sesijaFacade.KreirajSesijuAsync(sesijaUcenja, korisnik);
@@ -240,8 +302,7 @@ namespace StudyBuddyApp.Controllers
 
             ModelState.AddModelError(string.Empty, rezultat.Poruka ?? "Došlo je do greške prilikom kreiranja sesije.");
 
-            ViewData["LokacijaId"] = new SelectList(_context.Lokacije, "IdLokacije", "Naziv", sesijaUcenja.LokacijaId);
-            ViewData["PredmetId"] = new SelectList(_context.Predmeti, "IdPredmeta", "Naziv", sesijaUcenja.PredmetId);
+            PopuniPadajuceListe(sesijaUcenja.LokacijaId, sesijaUcenja.PredmetId);
 
             return View(sesijaUcenja);
         }
