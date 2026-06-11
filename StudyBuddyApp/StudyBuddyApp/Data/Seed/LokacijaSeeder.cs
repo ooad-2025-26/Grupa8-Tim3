@@ -11,7 +11,7 @@ namespace StudyBuddyApp.Data.Seed
             {
                 new Lokacija
                 {
-                    Naziv = "HomeworkHub",
+                    Naziv = "Homework Hub",
                     TipLokacije = TipLokacije.Fizicka,
                     Adresa = "Grbavička bb, Sarajevo",
                     Link = string.Empty
