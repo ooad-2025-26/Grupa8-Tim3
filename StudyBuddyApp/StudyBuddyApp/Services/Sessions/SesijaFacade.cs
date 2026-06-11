@@ -81,7 +81,7 @@ namespace StudyBuddyApp.Services.Sessions
 
             if (lokacijaZauzeta)
             {
-                return SessionOperationResult.Greska("Odabrana lokacija je već zauzeta u tom terminu. Odaberite drugu lokaciju ili promijenite vrijeme.");
+                return SessionOperationResult.Greska("Odabrana lokacija je već zauzeta u tom terminu. Odaberite drugu lokaciju ili promijenite vrijeme održavanja.");
             }
 
             var sesija = new SesijaUcenjaBuilder()

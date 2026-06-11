@@ -475,7 +475,7 @@ namespace StudyBuddyApp.Controllers
             }
             else
             {
-                TempData["Greska"] = rezultat.Poruka;
+                TempData["Greška"] = rezultat.Poruka;
             }
 
             if (sesijaId.HasValue)
