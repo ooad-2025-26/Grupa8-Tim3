@@ -120,6 +120,16 @@
                         }
                     </ul>
 
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <span style="color:red; margin-left:20px; font-weight:bold;">
+                            Auth: @User.Identity.IsAuthenticated |
+                            Student: @User.IsInRole("Student") |
+                            Admin: @User.IsInRole("Administrator") |
+                            Moderator: @User.IsInRole("Moderator")
+                        </span>
+                    }
+
                     <partial name="_LoginPartial" />
                 </div>
             </div>
