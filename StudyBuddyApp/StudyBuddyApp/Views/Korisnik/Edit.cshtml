@@ -5,57 +5,65 @@
     ViewData["Title"] = "Uređivanje korisnika";
 }
 
-<h1>Uređivanje korisnika</h1>
+<div class="page-header">
+    <div>
+        <h1>Uređivanje korisnika</h1>
+        <p>Izmijeni osnovne podatke, ulogu i status korisničkog naloga.</p>
+    </div>
+</div>
 
-<h4>Korisnik</h4>
-<hr />
+<div class="form-card">
+    <form asp-action="Edit" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
 
-            <input type="hidden" asp-for="Id" />
-
+        <div class="form-grid">
             <div class="form-group">
-                <label asp-for="Ime" class="control-label"></label>
+                <label asp-for="Ime" class="control-label">Ime</label>
                 <input asp-for="Ime" class="form-control" />
                 <span asp-validation-for="Ime" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Prezime" class="control-label"></label>
+                <label asp-for="Prezime" class="control-label">Prezime</label>
                 <input asp-for="Prezime" class="form-control" />
                 <span asp-validation-for="Prezime" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
+                <label asp-for="Email" class="control-label">Email</label>
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="Uloga" class="control-label"></label>
-                <select asp-for="Uloga" class="form-control" asp-items="Html.GetEnumSelectList<TipUloge>()"></select>
+                <label asp-for="Uloga" class="control-label">Uloga</label>
+                <select asp-for="Uloga" class="form-select" asp-items="Html.GetEnumSelectList<TipUloge>()">
+                    <option value="">Odaberi ulogu</option>
+                </select>
                 <span asp-validation-for="Uloga" class="text-danger"></span>
             </div>
 
             <div class="form-group">
-                <label asp-for="StatusNaloga" class="control-label"></label>
-                <select asp-for="StatusNaloga" class="form-control" asp-items="Html.GetEnumSelectList<StatusNaloga>()"></select>
+                <label asp-for="StatusNaloga" class="control-label">Status naloga</label>
+                <select asp-for="StatusNaloga" class="form-select" asp-items="Html.GetEnumSelectList<StatusNaloga>()">
+                    <option value="">Odaberi status</option>
+                </select>
                 <span asp-validation-for="StatusNaloga" class="text-danger"></span>
             </div>
+        </div>
 
-            <div class="form-group mt-2">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary-sb">
+                Sačuvaj
+            </button>
 
-<div class="mt-2">
-    <a asp-action="Index">Back to List</a>
+            <a asp-action="Index" class="btn btn-outline-sb">
+                Odustani
+            </a>
+        </div>
+    </form>
 </div>
 
 @section Scripts {
