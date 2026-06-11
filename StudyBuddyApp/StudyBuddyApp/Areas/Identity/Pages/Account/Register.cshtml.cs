@@ -104,7 +104,19 @@ namespace StudyBuddyApp.Areas.Identity.Pages.Account
                         await _roleManager.CreateAsync(new IdentityRole("Student"));
                     }
 
-                    await _userManager.AddToRoleAsync(user, "Student");
+                    var roleResult = await _userManager.AddToRoleAsync(user, "Student");
+
+                    if (!roleResult.Succeeded)
+                    {
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+
+                        return Page();
+                    }
+
+                    await _signInManager.RefreshSignInAsync(user);
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

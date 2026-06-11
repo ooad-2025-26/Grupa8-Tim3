@@ -78,7 +78,20 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider
         .GetRequiredService<ApplicationDbContext>();
 
+    var roleManager = scope.ServiceProvider
+        .GetRequiredService<RoleManager<IdentityRole>>();
+
     db.Database.Migrate();
+
+    string[] roleNames = { "Administrator", "Moderator", "Student" };
+
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            await roleManager.CreateAsync(new IdentityRole(roleName));
+        }
+    }
 
     await PredmetSeeder.SeedAsync(db);
     await LokacijaSeeder.SeedAsync(db);
