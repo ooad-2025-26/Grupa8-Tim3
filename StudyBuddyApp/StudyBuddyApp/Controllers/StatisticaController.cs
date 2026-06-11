@@ -8,7 +8,7 @@ using StudyBuddyApp.Services.Statistics;
 
 namespace StudyBuddyApp.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator,Student")]
     public class StatistikaController : Controller
     {
         private readonly UserManager<Korisnik> _userManager;
