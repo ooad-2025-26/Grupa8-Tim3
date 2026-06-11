@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
 using StudyBuddyApp.Data;
 using StudyBuddyApp.Data.Seed;
 using StudyBuddyApp.Models;
@@ -30,6 +31,8 @@ builder.Services.AddDefaultIdentity<Korisnik>(options =>
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddScoped<IClaimsTransformation, KorisnikClaimsTransformation>();
 
 builder.Services.AddScoped<ObavjestenjeFactory>();
 builder.Services.AddScoped<EksterniEmailServis>();
