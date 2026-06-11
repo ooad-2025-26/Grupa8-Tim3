@@ -1,17 +1,47 @@
 # Grupa8-Tim3
 # StudyBuddy
+# StudyBuddy
 
 StudyBuddy je web aplikacija razvijena u ASP.NET Core MVC tehnologiji, namijenjena organizaciji i praćenju sesija učenja. Sistem omogućava studentima kreiranje i pregled sesija učenja, prijavu na dostupne sesije, evidenciju prisustva, pregled statistike i primanje obavještenja.
 
 Aplikacija koristi PostgreSQL bazu podataka, ASP.NET Core Identity za autentifikaciju i autorizaciju korisnika, te role-based pristup za rad sa različitim tipovima korisnika.
 
-## Funkcionalnosti aplikacije
+## Pristup aplikaciji
 
-StudyBuddy podržava tri glavne korisničke uloge:
+Aplikacija je deployana na Render platformi.
 
-* Administrator
-* Moderator
+Link aplikacije:
+
+https://grupa8-tim3.onrender.com
+
+## Pristupni podaci za testiranje
+
+Za testiranje aplikacije mogu se koristiti sljedeći korisnički nalozi:
+
+### Student
+
+Email: `student@test.com`
+Lozinka: `Student123!`
+
+### Moderator
+
+Email: `mod@test.com`
+Lozinka: `Moderator123!`
+
+### Administrator
+
+Email: `admin@test.com`
+Lozinka: `Admin123!`
+
+Registracija novih korisnika je funkcionalna. Svaki novi registrovani korisnik automatski dobija studentsku ulogu.
+
+## Korisničke uloge
+
+Aplikacija podržava tri korisničke uloge:
+
 * Student
+* Moderator
+* Administrator
 
 ### Student
 
@@ -32,10 +62,11 @@ Student može:
 Moderator može:
 
 * pregledati sesije učenja,
-* pregledati prijave na sesije,
-* evidentirati prisustvo studenata,
-* pregledati obavještenja,
-* pristupiti dijelu sistema namijenjenom nadzoru i organizaciji sesija.
+* pregledati detalje sesija,
+* evidentirati prisustvo korisnika,
+* pregledati obavještenja.
+
+Moderator nema pristup administratorskim funkcionalnostima i nema pristup statistici učenja, jer je njegova uloga fokusirana na evidenciju prisustva.
 
 ### Administrator
 
@@ -47,9 +78,9 @@ Administrator ima puni pristup sistemu i može:
 * upravljati sesijama učenja,
 * pregledati i uređivati prijave na sesije,
 * upravljati evidencijom prisustva,
-* pregledati obavještenja,
+* pregledati i brisati obavještenja,
 * pregledati statistiku korisnika,
-* uređivati i brisati podatke u sistemu.
+* upravljati ulogama.
 
 ## Glavni entiteti sistema
 
@@ -123,7 +154,7 @@ Aplikacija omogućava pregled statistike učenja. Student može pregledati vlast
 
 Statistika uključuje podatke kao što su:
 
-* broj kreiranih ili pohađanih sesija,
+* broj kreiranih sesija,
 * broj evidentiranih prisustava,
 * ukupno vrijeme učenja.
 
@@ -169,21 +200,25 @@ U projektu su korištene sljedeće tehnologije:
 * CSS
 * JavaScript
 * Bootstrap
+* Render
+* Docker
 * Git i GitHub
 
 ## Baza podataka
 
 Aplikacija koristi PostgreSQL bazu podataka. Entity Framework Core se koristi za rad sa bazom, migracije i mapiranje modela na tabele.
 
-U bazu se automatski dodaju početni podaci za predmete i lokacije pomoću seeder klasa.
+Baza podataka je postavljena na Render platformi. Početni podaci za predmete i lokacije dodaju se kroz seeder klase.
 
-## Pokretanje projekta
+Aplikacija koristi ASP.NET Core Identity tabele za autentifikaciju i autorizaciju korisnika, uključujući tabele za korisnike, role i povezivanje korisnika sa rolama.
 
-Za pokretanje projekta potrebno je:
+## Pokretanje projekta lokalno
+
+Za lokalno pokretanje projekta potrebno je:
 
 1. Klonirati repozitorij.
 2. Otvoriti projekat u Visual Studio okruženju.
-3. Podesiti connection string za PostgreSQL bazu u `appsettings.json`.
+3. Podesiti konekcijski string za PostgreSQL bazu u `appsettings.json`.
 4. Pokrenuti migracije ili pokrenuti aplikaciju ako se migracije izvršavaju automatski.
 5. Pokrenuti aplikaciju.
 
@@ -193,6 +228,20 @@ Primjer pokretanja kroz terminal:
 dotnet build
 dotnet run
 ```
+
+## Deployment
+
+Aplikacija je deployana na Render platformi korištenjem Docker konfiguracije.
+
+Deployment koristi:
+
+* GitHub repozitorij,
+* Dockerfile,
+* Render Web Service,
+* Render PostgreSQL bazu,
+* environment varijable za konekciju na bazu.
+
+Konekcijski string nije naveden javno u README datoteci zbog sigurnosti.
 
 ## Struktura projekta
 
@@ -204,10 +253,19 @@ Najvažniji dijelovi projekta su:
 * `Data` — ApplicationDbContext i seed podaci
 * `Services` — poslovna logika i implementacija dizajn paterna
 * `wwwroot` — CSS, JavaScript i statički resursi
+* `Areas/Identity` — stranice za autentifikaciju i registraciju korisnika
 
 ## UI dizajn
 
 Korisnički interfejs aplikacije je prilagođen StudyBuddy temi. Aplikacija koristi ružičasto-bijelu paletu boja, kartice, forme i pregledne tabele. Posebna pažnja posvećena je stranicama za kreiranje sesija, pregled sesija, detalje entiteta, brisanje entiteta, prijavu i registraciju korisnika.
+
+## Napomene
+
+Dodjeljivanje uloga kroz poseban korisnički interfejs nije implementirano. Novi korisnici koji se registruju automatski dobijaju studentsku ulogu. Administratorski i moderatorski nalozi su unaprijed pripremljeni za potrebe testiranja i demonstracije.
+
+Aplikacija ne koristi vanjski API za mape. Online lokacije koriste linkove za online sobe, a u demo verziji koristi se Google Meet generator linkova.
+
+Korisnički interfejs je prilagođen prikazu na računaru na kojem se aplikacija prezentuje.
 
 ## Zaključak
 
