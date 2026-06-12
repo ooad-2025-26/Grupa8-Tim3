@@ -116,16 +116,11 @@
                 <span asp-validation-for="MaksimalanBrojUcesnika" class="text-danger"></span>
             </div>
 
-            <div class="form-group">
-                <label asp-for="StatusSesije" class="control-label">Status sesije</label>
-                <select asp-for="StatusSesije" class="form-select" asp-items="Html.GetEnumSelectList<StatusSesije>()"></select>
-                <span asp-validation-for="StatusSesije" class="text-danger"></span>
-            </div>
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="btn btn-primary-sb">Sačuvaj</button>
-            <a asp-action="Index" class="btn btn-outline-sb">Odustani</a>
+            <button type="submit" class="btn btn-primary-sb btn-action-equal">Sačuvaj</button>
+            <a asp-action="Index" class="btn btn-outline-sb btn-action-equal">Odustani</a>
         </div>
     </form>
 </div>

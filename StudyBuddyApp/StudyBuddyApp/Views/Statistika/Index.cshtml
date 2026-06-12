@@ -7,20 +7,22 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Statistika učenja</h1>
+    <div class="page-title-row centered">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
 
-        @if (prikazaniKorisnik != null)
-        {
+        <div class="page-title-text">
+            <h1>Statistika učenja</h1>
             <p>
                 Pregled osnovnih pokazatelja aktivnosti za korisnika:
-                <strong>@prikazaniKorisnik.Ime @prikazaniKorisnik.Prezime</strong>
+                <strong>@ViewBag.KorisnikIme</strong>
             </p>
-        }
-        else
-        {
-            <p>Pregled osnovnih pokazatelja aktivnosti korisnika u sistemu.</p>
-        }
+        </div>
     </div>
 </div>
 
@@ -59,10 +61,30 @@ else
     <div class="stats-grid">
         @foreach (var item in Model)
         {
-            <div class="stats-card">
-                <span class="stats-label">@item.Naziv</span>
-                <strong>@item.Vrijednost</strong>
-                <p>@item.Opis</p>
+            var naziv = item.Naziv?.ToLower() ?? "";
+            var ikonica = "📊";
+
+            if (naziv.Contains("vrijeme") || naziv.Contains("učenja") || naziv.Contains("ucenja"))
+            {
+                ikonica = "⏳";
+            }
+            else if (naziv.Contains("prisust"))
+            {
+                ikonica = "✅";
+            }
+            else if (naziv.Contains("sesij"))
+            {
+                ikonica = "📚";
+            }
+
+            <div class="stats-card stats-card-with-icon">
+                <div class="stats-icon">@ikonica</div>
+
+                <div class="stats-content">
+                    <span class="stats-label">@item.Naziv</span>
+                    <strong>@item.Vrijednost</strong>
+                    <p>@item.Opis</p>
+                </div>
             </div>
         }
     </div>

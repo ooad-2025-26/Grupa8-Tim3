@@ -5,9 +5,19 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Uloge</h1>
-        <p>Pregled uloga koje definišu prava pristupa korisnika u sistemu.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Uloge</h1>
+            <p>Pregled uloga koje definišu prava pristupa korisnika u sistemu.</p>
+        </div>
     </div>
 
     <a asp-action="Create" class="btn btn-primary-sb">Dodaj ulogu</a>

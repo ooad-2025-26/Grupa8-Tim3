@@ -6,11 +6,23 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Predmeti</h1>
-        <p>Pregled predmeta koji se koriste pri kreiranju sesija učenja.</p>
-    </div>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
 
+        <div class="page-title-text">
+            <div>
+                <h1>Predmeti</h1>
+                <p>Pregled predmeta koji se koriste pri kreiranju sesija učenja.</p>
+            </div>
+        </div>
+    </div>
+    
     @if (User.IsInRole("Administrator"))
     {
         <a asp-action="Create" class="btn btn-primary-sb">Dodaj predmet</a>

@@ -243,3 +243,56 @@
         grid-template-columns: 1fr;
     }
 }
+
+.filter-submit-button {
+    display: none !important;
+}
+
+.filter-checkbox-pill {
+    width: 100%;
+    min-height: 48px;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+    border: 1px solid #f2c6d8;
+    background: #fff0f6;
+    color: #4a2b38;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    white-space: nowrap;
+    cursor: pointer;
+    margin: 0;
+}
+
+    .filter-checkbox-pill span {
+        line-height: 1;
+        display: inline-block;
+    }
+
+.filter-checkbox-input {
+    margin: 0 !important;
+    flex-shrink: 0;
+    border-color: #d63384;
+}
+
+    .filter-checkbox-input:checked {
+        background-color: #d63384;
+        border-color: #d63384;
+    }
+
+    .filter-checkbox-input:focus {
+        border-color: #d63384;
+        box-shadow: 0 0 0 0.18rem rgba(214, 51, 132, 0.18);
+    }
+
+.filter-checkbox {
+    min-width: 320px;
+    grid-column: auto;
+}
+
+.filter-checkbox-pill {
+    width: fit-content;
+    min-width: 320px;
+    max-width: 340px;
+}

@@ -5,9 +5,19 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Obavještenja</h1>
-        <p>Pregled informacija o prijavama, otkazivanjima i promjenama u sistemu.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Obavještenja</h1>
+            <p>Pregledaj najnovije informacije o prijavama i sesijama.</p>
+        </div>
     </div>
 
     @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
@@ -62,7 +72,7 @@ else
                 </div>
 
                 <div class="notification-actions">
-                    <a asp-action="Details" asp-route-id="@item.IdObavjestenja" class="btn btn-outline-sb">
+                    <a asp-action="Details" asp-route-id="@item.IdObavjestenja" class="btn btn-outline-sb btn-action-equal">
                         Detalji
                     </a>
 
@@ -70,7 +80,7 @@ else
                     {
                         <form asp-action="OznaciKaoProcitano" asp-route-id="@item.IdObavjestenja" method="post">
                             @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-secondary">
+                            <button type="submit" class="btn btn-soft-gray btn-action-equal">
                                 Označi kao pročitano
                             </button>
                         </form>

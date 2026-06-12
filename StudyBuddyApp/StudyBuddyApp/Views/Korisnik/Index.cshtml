@@ -5,9 +5,21 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Korisnici</h1>
-        <p>Pregled korisnika, njihovih uloga i statusa naloga u sistemu.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <div>
+                <h1>Korisnici</h1>
+                <p>Pregled korisnika, njihovih uloga i statusa naloga u sistemu.</p>
+            </div>
+        </div>
     </div>
 
     <a asp-action="Create" class="btn btn-primary-sb">Dodaj korisnika</a>

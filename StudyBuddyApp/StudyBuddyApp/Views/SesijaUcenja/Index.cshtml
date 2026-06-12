@@ -7,14 +7,24 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Pregled sesija</h1>
-        <p>Pronađi dostupne sesije učenja i pridruži se aktivnim terminima.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Sesije učenja</h1>
+            <p>Pregledaj dostupne sesije, filtriraj ih i pronađi termin za učenje.</p>
+        </div>
     </div>
 
     @if (User.IsInRole("Administrator") || User.IsInRole("Student"))
     {
-        <a asp-action="Create" class="btn btn-primary-sb">Kreiraj sesiju</a>
+        <a asp-action="Create" class="btn btn-primary-sb btn-action-equal">Kreiraj sesiju</a>
     }
 </div>
 
@@ -26,7 +36,7 @@
 }
 
 <div class="session-filter-card">
-    <form asp-controller="SesijaUcenja" asp-action="Index" method="get">
+    <form asp-controller="SesijaUcenja" asp-action="Index" method="get" class="session-filter-form" id="sessionFilterForm">
         <div class="session-filter-grid">
             <div class="form-group filter-search">
                 <label class="control-label">Pretraga</label>
@@ -108,23 +118,28 @@
 
             <div class="form-group filter-checkbox">
                 <label class="control-label">Dostupnost</label>
-                <div class="form-check pretty-check">
-                    <input class="form-check-input"
+
+                <label class="filter-checkbox-pill" for="samoSlobodnaMjesta">
+                    <input class="form-check-input filter-checkbox-input"
                            type="checkbox"
                            name="samoSlobodnaMjesta"
                            value="true"
                            id="samoSlobodnaMjesta"
                            checked="@samoSlobodnaMjesta" />
-                    <label class="form-check-label" for="samoSlobodnaMjesta">
-                        Samo sesije sa slobodnim mjestima
-                    </label>
-                </div>
+
+                    <span>Samo sesije sa slobodnim mjestima</span>
+                </label>
             </div>
         </div>
 
         <div class="filter-actions">
-            <button type="submit" class="btn btn-primary-sb">Primijeni filtere</button>
-            <a asp-controller="SesijaUcenja" asp-action="Index" class="btn btn-outline-sb">Poništi sve filtere</a>
+            <button type="submit" class="btn btn-primary-sb btn-action-equal filter-submit-button">
+                Primijeni filtere
+            </button>
+
+            <a asp-controller="SesijaUcenja" asp-action="Index" class="btn btn-outline-sb btn-action-equal">
+                Poništi sve filtere
+            </a>
         </div>
     </form>
 </div>
@@ -177,17 +192,26 @@ else
                 </div>
 
                 <div class="session-actions">
-                    <a asp-action="Details" asp-route-id="@item.IdSesije" class="btn btn-outline-sb">
+                    <a asp-action="Details" asp-route-id="@item.IdSesije" class="btn btn-outline-sb btn-action-equal">
                         Detalji / prijava
                     </a>
 
+                    @if (User.IsInRole("Moderator"))
+                    {
+                        <a asp-action="EditStatus"
+                               asp-route-id="@item.IdSesije"
+                               class="btn btn-primary-sb btn-action-equal">
+                            Uredi status
+                        </a>
+                    }
+
                     @if (User.IsInRole("Administrator"))
                     {
-                        <a asp-action="Edit" asp-route-id="@item.IdSesije" class="btn btn-secondary">
+                        <a asp-action="Edit" asp-route-id="@item.IdSesije" class="btn btn-secondary btn-action-equal">
                             Uredi
                         </a>
 
-                        <a asp-action="Delete" asp-route-id="@item.IdSesije" class="btn btn-danger">
+                        <a asp-action="Delete" asp-route-id="@item.IdSesije" class="btn btn-danger btn-action-equal">
                             Obriši
                         </a>
                     }
@@ -195,4 +219,39 @@ else
             </div>
         }
     </div>
+}
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const filterForm = document.getElementById("sessionFilterForm");
+
+            if (!filterForm) {
+                return;
+            }
+
+            const autoSubmitElements = filterForm.querySelectorAll(
+                "select, input[type='checkbox']"
+            );
+
+            autoSubmitElements.forEach(function (element) {
+                element.addEventListener("change", function () {
+                    filterForm.submit();
+                });
+            });
+
+            const searchInput = filterForm.querySelector("input[name='pretraga']");
+            let searchTimeout;
+
+            if (searchInput) {
+                searchInput.addEventListener("input", function () {
+                    clearTimeout(searchTimeout);
+
+                    searchTimeout = setTimeout(function () {
+                        filterForm.submit();
+                    }, 700);
+                });
+            }
+        });
+    </script>
 }

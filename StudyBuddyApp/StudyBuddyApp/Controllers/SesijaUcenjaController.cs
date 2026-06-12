@@ -87,6 +87,7 @@ namespace StudyBuddyApp.Controllers
                 "mjesta" => sesije.OrderBy(s => s.BrojSlobodnihMjesta),
                 "mjesta_desc" => sesije.OrderByDescending(s => s.BrojSlobodnihMjesta),
                 "naziv" => sesije.OrderBy(s => s.Naziv),
+                "naziv_desc" => sesije.OrderByDescending(s => s.Naziv),
                 _ => sesije.OrderBy(s => s.DatumVrijeme)
             };
 
@@ -128,18 +129,19 @@ namespace StudyBuddyApp.Controllers
             );
 
             ViewBag.Sortiranja = new SelectList(
-                new[]
-                {
-            new { Value = "datum", Text = "Datum: prvo najranije" },
-            new { Value = "datum_desc", Text = "Datum: prvo najkasnije" },
-            new { Value = "mjesta_desc", Text = "Slobodna mjesta: najviše prvo" },
-            new { Value = "mjesta", Text = "Slobodna mjesta: najmanje prvo" },
-            new { Value = "naziv", Text = "Naziv sesije" }
-                },
-                "Value",
-                "Text",
-                sortiranje
-            );
+    new[]
+    {
+        new { Value = "datum", Text = "Datum ↑ najranije" },
+        new { Value = "datum_desc", Text = "Datum ↓ najkasnije" },
+        new { Value = "naziv", Text = "Naziv A-Z" },
+        new { Value = "naziv_desc", Text = "Naziv Z-A" },
+        new { Value = "mjesta_desc", Text = "Slobodna mjesta ↓ najviše" },
+        new { Value = "mjesta", Text = "Slobodna mjesta ↑ najmanje" }
+    },
+    "Value",
+    "Text",
+    sortiranje
+);
 
             return View(await sesije.ToListAsync());
         }
@@ -211,6 +213,51 @@ namespace StudyBuddyApp.Controllers
             return View(sesijaUcenja);
         }
 
+        [Authorize(Roles = "Administrator,Moderator")]
+        public async Task<IActionResult> EditStatus(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var sesija = await _context.SesijeUcenja
+                .FirstOrDefaultAsync(s => s.IdSesije == id);
+
+            if (sesija == null)
+            {
+                return NotFound();
+            }
+
+            return View(sesija);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator,Moderator")]
+        public async Task<IActionResult> EditStatus(int id, [Bind("IdSesije,StatusSesije")] SesijaUcenja sesijaUcenja)
+        {
+            if (id != sesijaUcenja.IdSesije)
+            {
+                return NotFound();
+            }
+
+            var postojecaSesija = await _context.SesijeUcenja.FindAsync(id);
+
+            if (postojecaSesija == null)
+            {
+                return NotFound();
+            }
+
+            postojecaSesija.StatusSesije = sesijaUcenja.StatusSesije;
+
+            await _context.SaveChangesAsync();
+
+            TempData["Poruka"] = "Status sesije je uspješno promijenjen.";
+
+            return RedirectToAction(nameof(Details), new { id = postojecaSesija.IdSesije });
+        }
+
         [Authorize(Roles = "Administrator,Student")]
         public IActionResult Create()
         {
@@ -221,12 +268,11 @@ namespace StudyBuddyApp.Controllers
         [Authorize(Roles = "Administrator,Student")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(
-    [Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,MaksimalanBrojUcesnika,StatusSesije")] SesijaUcenja sesijaUcenja,
-    string? NovaLokacijaNaziv,
-    TipLokacije? NovaLokacijaTip,
-    string? NovaLokacijaAdresa,
-    string? NovaLokacijaLink)
+        public async Task<IActionResult> Create([Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,MaksimalanBrojUcesnika")] SesijaUcenja sesijaUcenja,
+            string? NovaLokacijaNaziv,
+            TipLokacije? NovaLokacijaTip,
+            string? NovaLokacijaAdresa,
+            string? NovaLokacijaLink)
         {
             var korisnik = await _userManager.GetUserAsync(User);
 
@@ -234,6 +280,8 @@ namespace StudyBuddyApp.Controllers
             {
                 return Challenge();
             }
+
+            sesijaUcenja.StatusSesije = StatusSesije.Aktivna;
 
             if (sesijaUcenja.LokacijaId == -1)
             {
@@ -331,7 +379,7 @@ namespace StudyBuddyApp.Controllers
         [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,KreatorId,MaksimalanBrojUcesnika,BrojSlobodnihMjesta,StatusSesije")] SesijaUcenja sesijaUcenja)
+        public async Task<IActionResult> Edit(int id, [Bind("IdSesije,Naziv,Opis,DatumVrijeme,Trajanje,LokacijaId,PredmetId,KreatorId,MaksimalanBrojUcesnika,BrojSlobodnihMjesta")] SesijaUcenja sesijaUcenja)
         {
             if (id != sesijaUcenja.IdSesije)
             {

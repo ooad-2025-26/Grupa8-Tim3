@@ -5,9 +5,19 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Prijave na sesiju</h1>
-        <p>Pregled prijava korisnika i njihovih trenutnih statusa.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Prijave na sesije</h1>
+            <p>Pregled prijava na sesije učenja.</p>
+        </div>
     </div>
 
     @if (User.IsInRole("Administrator"))

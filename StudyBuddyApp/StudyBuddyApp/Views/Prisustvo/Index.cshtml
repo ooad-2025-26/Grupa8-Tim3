@@ -5,9 +5,19 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Prisustva</h1>
-        <p>Pregled evidentiranog prisustva i trajanja učenja na sesijama.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Evidencija prisustva</h1>
+            <p>Pregled i upravljanje prisustvom na sesijama.</p>
+        </div>
     </div>
 
     @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))

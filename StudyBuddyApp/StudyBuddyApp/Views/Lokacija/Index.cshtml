@@ -5,9 +5,21 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Lokacije</h1>
-        <p>Pregled fizičkih i online lokacija koje se koriste za sesije učenja.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <div>
+                <h1>Lokacije</h1>
+                <p>Pregled fizičkih i online lokacija koje se koriste za sesije učenja.</p>
+            </div>
+        </div>
     </div>
 
     @if (User.IsInRole("Administrator"))

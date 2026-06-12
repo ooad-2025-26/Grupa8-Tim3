@@ -169,3 +169,24 @@
     .sb-modal .modal-footer {
         border-top: 1px solid var(--sb-border);
     }
+
+.btn-soft-gray {
+    background: #f1f1f1;
+    color: #555;
+    border: 1px solid #dedede;
+    border-radius: 999px;
+    padding: 0.55rem 1rem;
+    min-height: 40px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+    .btn-soft-gray:hover,
+    .btn-soft-gray:focus {
+        background: #e7e7e7;
+        color: #333;
+        text-decoration: none;
+    }

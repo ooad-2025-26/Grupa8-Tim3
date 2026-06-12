@@ -13,9 +13,18 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Detalji sesije</h1>
-        <p>Pregled informacija o sesiji i prijava na termin.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Detalji sesije</h1>
+        </div>
     </div>
 </div>
 
@@ -101,14 +110,18 @@
             {
                 <form asp-action="CancelJoin" asp-route-id="@idPrijave.Value" method="post">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-warning">Otkaži prijavu</button>
+                    <button type="submit" class="btn btn-soft-warning btn-action-equal">
+                        Otkaži prijavu
+                    </button>
                 </form>
             }
             else if (Model.StatusSesije == StatusSesije.Aktivna && Model.BrojSlobodnihMjesta > 0)
             {
                 <form asp-action="Join" asp-route-id="@Model.IdSesije" method="post">
                     @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-success">Prijavi se</button>
+                    <button type="submit" class="btn btn-join btn-action-equal">
+                        Prijavi se
+                    </button>
                 </form>
             }
             else if (Model.StatusSesije != StatusSesije.Aktivna)
@@ -121,14 +134,23 @@
             }
         }
 
+        @if (User.IsInRole("Moderator"))
+        {
+            <a asp-action="EditStatus"
+                   asp-route-id="@Model.IdSesije"
+                   class="btn btn-primary-sb btn-action-equal">
+                Uredi status
+            </a>
+        }
+
         @if (User.IsInRole("Administrator"))
         {
-            <a asp-action="Edit" asp-route-id="@Model.IdSesije" class="btn btn-primary">
+            <a asp-action="Edit" asp-route-id="@Model.IdSesije" class="btn btn-primary-sb btn-action-equal">
                 Uredi
             </a>
         }
 
-        <a asp-action="Index" class="btn btn-outline-sb">
+        <a asp-action="Index" class="btn btn-outline-sb btn-action-equal">
             Nazad na sesije
         </a>
     </div>

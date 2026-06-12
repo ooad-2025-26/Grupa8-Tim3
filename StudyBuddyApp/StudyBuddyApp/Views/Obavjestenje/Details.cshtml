@@ -10,9 +10,18 @@
 }
 
 <div class="page-header">
-    <div>
-        <h1>Detalji obavještenja</h1>
-        <p>Pregled sadržaja i statusa odabranog obavještenja.</p>
+    <div class="page-title-row">
+        <a asp-controller="Home"
+               asp-action="Index"
+               class="icon-back-btn"
+               title="Nazad na početnu"
+               aria-label="Nazad na početnu">
+            <span class="back-icon">‹</span>
+        </a>
+
+        <div class="page-title-text">
+            <h1>Detalji obavještenja</h1>
+        </div>
     </div>
 </div>
 
@@ -70,7 +79,9 @@
             Obriši obavještenje
         </button>
 
-        <a asp-action="Index" class="btn btn-outline-sb">Nazad na obavještenja</a>
+        <a asp-action="Index" class="btn btn-outline-sb btn-action-equal">
+            Nazad na obavještenja
+        </a>
     </div>
 </div>
 
