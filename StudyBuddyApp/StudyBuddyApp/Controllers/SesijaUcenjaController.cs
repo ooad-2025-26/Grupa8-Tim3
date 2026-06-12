@@ -468,12 +468,26 @@ namespace StudyBuddyApp.Controllers
         {
             var sesijaUcenja = await _context.SesijeUcenja.FindAsync(id);
 
-            if (sesijaUcenja != null)
+            if (sesijaUcenja == null)
             {
-                _context.SesijeUcenja.Remove(sesijaUcenja);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
 
+            var prijave = await _context.PrijaveNaSesije
+                .Where(p => p.SesijaId == id)
+                .ToListAsync();
+
+            var prisustva = await _context.Prisustva
+                .Where(p => p.SesijaId == id)
+                .ToListAsync();
+
+            _context.PrijaveNaSesije.RemoveRange(prijave);
+            _context.Prisustva.RemoveRange(prisustva);
+            _context.SesijeUcenja.Remove(sesijaUcenja);
+
+            await _context.SaveChangesAsync();
+
+            TempData["Poruka"] = "Sesija je uspješno obrisana.";
             return RedirectToAction(nameof(Index));
         }
 
