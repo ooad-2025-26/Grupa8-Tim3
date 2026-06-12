@@ -19,11 +19,6 @@
             <p>Pregled prijava na sesije učenja.</p>
         </div>
     </div>
-
-    @if (User.IsInRole("Administrator"))
-    {
-        <a asp-action="Create" class="btn btn-primary-sb">Kreiraj prijavu</a>
-    }
 </div>
 
 @if (!Model.Any())

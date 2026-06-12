@@ -19,11 +19,6 @@
             <p>Pregledaj najnovije informacije o prijavama i sesijama.</p>
         </div>
     </div>
-
-    @if (User.IsInRole("Administrator") || User.IsInRole("Moderator"))
-    {
-        <a asp-action="Create" class="btn btn-primary-sb">Kreiraj obavještenje</a>
-    }
 </div>
 
 @if (TempData["Poruka"] != null)
