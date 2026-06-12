@@ -1,6 +1,5 @@
 # Grupa8-Tim3
 # StudyBuddy
-# StudyBuddy
 
 StudyBuddy je web aplikacija razvijena u ASP.NET Core MVC tehnologiji, namijenjena organizaciji i praćenju sesija učenja. Sistem omogućava studentima kreiranje i pregled sesija učenja, prijavu na dostupne sesije, evidenciju prisustva, pregled statistike i primanje obavještenja.
 
@@ -26,7 +25,7 @@ Lozinka: `Student123!`
 ### Moderator
 
 Email: `mod@test.com`
-Lozinka: `Moderator123!`
+Lozinka: `Mod123!`
 
 ### Administrator
 
@@ -211,23 +210,6 @@ Aplikacija koristi PostgreSQL bazu podataka. Entity Framework Core se koristi za
 Baza podataka je postavljena na Render platformi. Početni podaci za predmete i lokacije dodaju se kroz seeder klase.
 
 Aplikacija koristi ASP.NET Core Identity tabele za autentifikaciju i autorizaciju korisnika, uključujući tabele za korisnike, role i povezivanje korisnika sa rolama.
-
-## Pokretanje projekta lokalno
-
-Za lokalno pokretanje projekta potrebno je:
-
-1. Klonirati repozitorij.
-2. Otvoriti projekat u Visual Studio okruženju.
-3. Podesiti konekcijski string za PostgreSQL bazu u `appsettings.json`.
-4. Pokrenuti migracije ili pokrenuti aplikaciju ako se migracije izvršavaju automatski.
-5. Pokrenuti aplikaciju.
-
-Primjer pokretanja kroz terminal:
-
-```bash
-dotnet build
-dotnet run
-```
 
 ## Deployment
 
