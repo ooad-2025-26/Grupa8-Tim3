@@ -4,8 +4,6 @@
     {
         Prva = 1,
         Druga = 2,
-        Treca = 3,
-        Cetvrta = 4,
-        Peta = 5
+        Treca = 3
     }
 }
